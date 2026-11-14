@@ -1,0 +1,36 @@
+/* SkyNest marketplace expansion */
+.marketplace-categories{padding:82px 9%;background:#f1f0e8}
+.marketplace-categories .section-heading{margin-bottom:32px}
+.marketplace-categories .category-intro{max-width:620px;color:#69746b;font-size:14px}
+.market-category-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.market-category{position:relative;min-height:250px;overflow:hidden;border-radius:7px;background:#17271f;color:#fff;isolation:isolate;box-shadow:0 10px 28px #18271c12;transition:transform .25s,box-shadow .25s}
+.market-category:hover{transform:translateY(-5px);box-shadow:0 18px 35px #18271c25}
+.market-category:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#08130d10 5%,#08130dba 100%);z-index:-1}
+.market-category img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform .5s}
+.market-category:hover img{transform:scale(1.06)}
+.market-category-copy{position:absolute;left:20px;right:18px;bottom:18px}
+.market-category .category-kicker{font-size:9px;letter-spacing:1.7px;color:#f1d99e;font-weight:800}
+.market-category h3{font:700 22px/1.15 var(--display);margin:7px 0}
+.market-category p{font-size:11px;line-height:1.5;color:#e1e7df;margin:0 0 13px;max-width:240px}
+.market-category a{display:inline-flex;align-items:center;gap:9px;font-size:11px;font-weight:800;color:#f4dba1}
+.marketplace-note{margin:18px 0 0;color:#778177;font-size:10px}
+.cookie-banner{position:fixed;z-index:1000;left:22px;right:22px;bottom:20px;max-width:1040px;margin:auto;background:#fff;color:#18251d;border:1px solid #e6e4da;border-radius:10px;box-shadow:0 20px 70px #08130d35;padding:20px 22px;display:none;grid-template-columns:1fr auto;gap:18px;align-items:center}
+.cookie-banner.is-visible{display:grid}
+.cookie-banner h2{font:800 17px var(--display);margin:0 0 5px}
+.cookie-banner p{font-size:11px;color:#68736a;line-height:1.6;margin:0;max-width:620px}
+.cookie-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.cookie-actions button,.cookie-settings button{border:1px solid #d8ddd4;background:#fff;border-radius:4px;padding:10px 13px;font-size:11px;font-weight:800;cursor:pointer;color:#243228}
+.cookie-actions .cookie-accept{background:#17271f;color:#f2dca7;border-color:#17271f}
+.cookie-settings{position:fixed;z-index:1001;inset:0;background:#09130dcc;display:none;place-items:center;padding:18px}
+.cookie-settings.is-visible{display:grid}
+.cookie-dialog{background:#fff;color:#17221b;width:min(480px,100%);border-radius:10px;padding:25px;box-shadow:0 20px 70px #0005}
+.cookie-dialog h2{font:800 22px var(--display);margin:0 0 7px}
+.cookie-dialog>p{font-size:12px;color:#68736a;line-height:1.7}
+.cookie-option{display:flex;justify-content:space-between;gap:15px;padding:14px 0;border-top:1px solid #e9ebe5;font-size:12px}
+.cookie-option small{display:block;color:#7c867d;margin-top:3px}
+.cookie-option input{width:18px;height:18px;accent-color:#17271f}
+.cookie-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
+.cookie-dialog-actions button{border:0;border-radius:4px;padding:11px 15px;font-weight:800;font-size:11px;cursor:pointer}
+.cookie-save{background:#17271f;color:#f2dca7}
+@media(max-width:900px){.market-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.marketplace-categories{padding:62px 6%}.market-category-grid{gap:12px}.market-category{min-height:210px}.market-category-copy{left:14px;right:12px;bottom:14px}.market-category h3{font-size:18px}.market-category p{font-size:10px}.cookie-banner{left:10px;right:10px;bottom:10px;padding:17px;grid-template-columns:1fr}.cookie-actions{justify-content:flex-start}.cookie-actions button{flex:1}.cookie-banner p{max-width:none}}
