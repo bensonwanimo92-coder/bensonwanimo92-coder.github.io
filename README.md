@@ -1,43 +1,37 @@
 # SkyNest Property Network
 
-A mobile-friendly nationwide property discovery and advertising front-end for Kenya.
+A Kenya-wide marketplace for discovering and advertising property, vehicles, hospitality, restaurants, products, services and other legitimate opportunities.
 
-## Nationwide experience
-- County navigation for all 47 counties.
-- County-aware discovery filtering alongside property type and town/estate search.
-- Advertiser listing intake includes county, town, category, advert type, price, contact and availability.
-- Responsive mobile, tablet and desktop layout.
-- Search metadata and installable web-app shell.
+## Marketplace experience
+- Browse all 47 counties and search by category, county, town and budget.
+- Advertiser Studio with verified email accounts and cloud drafts.
+- Category-aware forms for homes, commercial spaces, land/farms, developments, vehicles, restaurants, hospitality, products, services and luxury adverts.
+- Category-specific fields for vehicle specifications, land details, property features, commercial space, dining, hospitality and more.
+- Multiple image uploads and short video clips, with client-side image resizing and upload limits.
+- Public feed displays approved, unexpired listings only.
+- Premium, Standard and Basic listing tiers are ordered in that priority, with newer adverts used as a secondary sort.
+- Cookie consent supports reject optional, accept all and granular preferences; optional cookies remain off by default.
+- Responsive layouts, category photography, reveal transitions and interactive controls.
 
-## Frontend versus production services
-This is a static GitHub Pages website. County navigation and preview interactions run in the browser. Sample cards remain illustrative, not verified vacancies. Advertiser forms do not create accounts, save adverts or publish inventory. A frontend change alone cannot guarantee 100x traffic or listing capacity.
+## Moderation
+- Pending adverts are private until reviewed.
+- Admin review includes photo/video previews, category details and advertiser information.
+- Admin can approve and publish, request changes with a reason, reject with a reason, assign an advertiser tier, and pause an already published advert.
+- Advertisers can correct and resubmit adverts returned for changes.
+- Admin actions record reviewer UID and timestamps.
+- The initial administrator bootstrap is restricted by the matching UID and verified email; custom-claim administrators are also supported by Firestore rules.
 
-## Production architecture for 100x growth
-1. Firebase Authentication for advertisers, staff and admins; verified contact details and role claims.
-2. Dedicated publicListings collection in the existing SkyNest Firebase project, separate from tenant, landlord, payment and private management records.
-3. Workflow: draft → submitted → moderation → approved/published → paused/expired/archived. Advertisers cannot approve their own listings.
-4. Firebase Storage with per-owner paths, file validation, resizing and CDN delivery.
-5. Cursor-based pagination, Firestore composite indexes, bounded queries, caching, abuse throttling and usage monitoring.
-6. Payment checkout with server-side webhook verification; never trust a browser-side paid flag.
-7. Backend-triggered, opt-in notifications by county/category; no indiscriminate blasts.
-8. Moderation queue, reporting, audit log, backups, analytics and error monitoring.
+## Firebase architecture and constraints
+- Uses the existing Firebase project and the isolated `publicListings` collection; private tenant, landlord, house and payment records are not used for public discovery.
+- Firebase Authentication email verification is required before advertisers can submit.
+- Storage paths are owner-scoped: `listing_media/{ownerUid}/{listingId}/...`.
+- Photos are limited to 10 per advert and 8 MB each before browser resizing; videos are limited to 3 per advert, 20 MB each and 60 seconds.
+- Firestore and Storage rules must be deployed from the coordinated SkyNest Android integration repository before media uploads and expanded listing categories can be tested end-to-end.
+- No Cloud Functions are required for basic draft upload and moderation; the Spark/free-plan requirement is retained. Storage quota and Firebase billing eligibility must be checked before accepting large volumes of video.
+- Payments, paid tier checkout, advanced analytics, automated moderation, large-scale CDN strategy and load testing are not part of this first phase.
 
-## Security boundaries
-- Public clients read only approved, published, non-expired listing fields.
-- Advertisers create/edit only their own drafts and submissions.
-- Only trusted admin roles approve, publish or suspend listings.
-- Never expose tenant records, rent/payment information, credentials or service-account keys in public documents.
-- Storage rules validate ownership, MIME type and file size.
-- Test rules against the Android schema in Firebase Emulator Suite before deployment.
+## Website-to-app integration
+The public website reads approved, unexpired documents from `publicListings`. Android must read the same collection and understand the expanded category/media/tier fields for the advert to appear in its Inventory. That cross-platform end-to-end test remains a required acceptance test; this branch is not yet deployed.
 
-## Next integration dependency
-Configure a Firebase Web App in the same Firebase project as Android. Supply only public web config (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId) and confirm Email/Password authentication is enabled. Never share a service-account JSON or private key.
-
-## Firebase marketplace integration (staged)
-- The advertiser portal now includes Firebase email/password registration and sign-in, email verification, cloud draft saving and submission for moderation.
-- The public feed is wired to read only approved, unexpired records from the separate `publicListings` collection.
-- A restricted moderation page uses the server-granted `marketplaceAdmin` custom claim to approve or reject submissions.
-- Firebase web configuration is a public client configuration; it is not a service-account credential.
-
-## Not live until backend rollout
-The website integration is staged on a feature branch. It will not be live until the website change is merged and published, the marketplace Firestore rules and indexes are merged/deployed from the SkyNest Android integration repository, and the administrator bootstrap Cloud Function is deployed and successfully invoked by the verified administrator account. Property photo uploads, payments, featured-ad billing, analytics and Android app synchronization remain future work. Do not deploy permissive rules or expose private SkyNest collections to make the website work.
+## Release process
+The work is staged on `feature/marketplace-expansion-phase1`. It must pass validation, be reviewed and merged, then be published by GitHub Pages. The coordinated Firestore and Storage rules change must also be reviewed, tested in Firebase emulators, merged and deployed before live uploads are enabled.
