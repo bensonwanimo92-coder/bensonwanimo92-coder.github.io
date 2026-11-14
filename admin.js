@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase-config.js";
 import { initCookieConsent } from "./consent.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { addDoc, collection, getDocs, orderBy, query, serverTimestamp, Timestamp, updateDoc, where, doc, limit } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { addDoc, collection, getDocs, orderBy, query, serverTimestamp, Timestamp, updateDoc, where, doc, limit, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 initCookieConsent();
 const $=id=>document.getElementById(id);
 let user=null,admin=false;
@@ -20,7 +20,7 @@ async function checkAccess(){
  else{$('accessStatus').textContent='This account is not an authorised marketplace administrator. Access is restricted.';$('queue').hidden=true;$('published').hidden=true;}
 }
 $('refreshButton').addEventListener('click',loadQueue);
-$('refreshPublishedButton').addEventListener('click',loadPublished);
+$('refreshPublishedButton').addEventListener('click',loadPublished);\n$('refreshAuditButton').addEventListener('click',loadAudit);
 function makeMediaPreview(item){
  const wrap=document.createElement('div');wrap.className='moderation-media';
  (item.media||[]).forEach(m=>{
