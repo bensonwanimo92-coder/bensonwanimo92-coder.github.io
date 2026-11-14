@@ -37,5 +37,5 @@ jobs:
           test -s advertiser.html
           test -s admin.html
           grep -q 'publicListings' app.js
-          grep -q 'marketplaceAdmin' admin.js
+          grep -q 'PN9bC3ZzgSaOK1JjG4TcjCU9Grx1' admin.js
           grep -q 'emailVerified' dashboard.js
