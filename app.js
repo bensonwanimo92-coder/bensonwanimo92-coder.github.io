@@ -28,6 +28,12 @@ function makeCard(item){
   const meta=document.createElement('div');meta.className='property-meta';meta.textContent=(item.category||'ADVERT')+' · '+(item.county||'KENYA');
   const title=document.createElement('h3');title.textContent=item.title||'SkyNest listing';
   const desc=document.createElement('p');desc.textContent=(item.town||'')+(item.estate?' · '+item.estate:'')+' — '+(item.description||'');
+  const images=(item.media||[]).filter(m=>m.kind==='image'&&m.url).map(m=>m.url);
+  if(images.length>1){const gallery=document.createElement('div');gallery.className='listing-gallery';images.slice(1,5).forEach((url,index)=>{const thumb=document.createElement('img');thumb.src=url;thumb.alt=(item.title||'Advert')+' photo '+(index+2);thumb.loading='lazy';gallery.append(thumb);});const count=document.createElement('span');count.textContent=images.length+' photos';gallery.append(count);info.append(gallery);}
+  const tour=(item.media||[]).find(m=>m.kind==='video'&&m.url);
+  if(tour){const video=document.createElement('video');video.className='listing-tour';video.src=tour.url;video.controls=true;video.preload='none';video.playsInline=true;video.hidden=true;
+    const play=document.createElement('button');play.type='button';play.className='tour-button';play.textContent='▶ Watch property tour';
+    play.addEventListener('click',()=>{video.hidden=false;play.hidden=true;video.play().catch(()=>{});});info.append(play,video);}
   const bottom=document.createElement('div');bottom.className='property-bottom';
   const price=document.createElement('strong');price.textContent=money(item.price)+(item.advertType==='For rent'?' / month':'');
   const contact=document.createElement('a');contact.className='round-arrow';contact.textContent='Contact ↗';contact.href='tel:'+String(item.contactPhone||'').replace(/[^+0-9]/g,'');contact.setAttribute('aria-label','Call advertiser');
