@@ -18,3 +18,5 @@
 @media(max-width:800px){.category-showcase-grid{grid-template-columns:repeat(2,1fr)}.category-showcase-card{min-height:190px}}
 @media(max-width:480px){.category-showcase-grid{grid-template-columns:1fr}.category-showcase-card{min-height:210px}}
 @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.category-showcase-card,.category-showcase-card img,.button{transition:none}}
+
+.listing-gallery{display:flex;align-items:center;gap:6px;margin:12px 0;overflow:hidden}.listing-gallery img{width:52px;height:42px;object-fit:cover;border-radius:3px}.listing-gallery span{font-size:9px;color:#8b958a;white-space:nowrap;margin-left:3px}.tour-button{border:1px solid #d8dfd4;background:#f4f6f1;color:#38513c;border-radius:4px;padding:8px 10px;font-size:10px;font-weight:800;cursor:pointer;margin:5px 0}.listing-tour{display:block;width:100%;max-height:210px;background:#101914;border-radius:5px;margin:8px 0}.listing-tour[hidden]{display:none}
