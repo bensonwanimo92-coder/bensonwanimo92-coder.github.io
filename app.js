@@ -49,12 +49,10 @@ async function loadPublicListings(){
     const q=query(collection(db,'publicListings'),where('status','==','approved'),where('expiresAt','>',Timestamp.now()),orderBy('expiresAt','asc'),orderBy('createdAt','desc'),limit(30));
     const snap=await getDocs(q);
     liveListings=snap.docs.map(d=>({id:d.id,...d.data()}));
-    const notice=document.querySelector('.demo-notice');
-    if(notice)notice.textContent=liveListings.length?'Showing approved, currently active advertiser listings.':'No approved live listings yet. Sample cards below are illustrative only.';
     if(liveListings.length){grid.replaceChildren(...liveListings.map(makeCard));}
     else {grid.innerHTML='<article class="property-card"><div class="property-info"><div class="property-meta">SKYNEST MARKETPLACE</div><h3>Listings are opening soon</h3><p>Advertisers can register and submit properties for review. Approved listings will appear here.</p></div></article>';}
     applyFilters();
-    if(status)status.textContent=liveListings.length+' approved live listings';
+    if(status)status.textContent=liveListings.length?liveListings.length+' approved live listings':'No approved listings yet';
   }catch(error){
     console.error('Could not load public listings',error);
     if(status)status.textContent='Live listings are not available yet.';
