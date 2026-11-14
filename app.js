@@ -37,7 +37,25 @@ function makeCard(item){
   const bottom=document.createElement('div');bottom.className='property-bottom';
   const price=document.createElement('strong');price.textContent=money(item.price)+(item.advertType==='For rent'?' / month':'');
   const contact=document.createElement('a');contact.className='round-arrow';contact.textContent='Contact ↗';contact.href='tel:'+String(item.contactPhone||'').replace(/[^+0-9]/g,'');contact.setAttribute('aria-label','Call advertiser');
-  bottom.append(price,contact);info.prepend(meta,title,desc);info.append(bottom);card.append(photo,info);return card;
+  bottom.append(price,contact);info.prepend(meta,title,desc);info.append(bottom);const view=document.createElement('button');view.type='button';view.className='view-details-button';view.textContent='View full advert ↗';view.addEventListener('click',()=>openListingDialog(item));info.append(view);card.append(photo,info);return card;
+}
+function openListingDialog(item){
+  const dialog=document.getElementById('listingDialog'),root=document.getElementById('listingDialogContent');if(!dialog||!root)return;
+  root.replaceChildren();
+  const title=document.createElement('h2');title.id='listingDialogTitle';title.textContent=item.title||'Advert details';
+  const meta=document.createElement('p');meta.className='dialog-meta';meta.textContent=[item.category,item.county,item.town].filter(Boolean).join(' · ');
+  const description=document.createElement('p');description.textContent=item.description||'';
+  const price=document.createElement('strong');price.className='dialog-price';price.textContent=money(item.price)+(item.advertType==='For rent'?' / month':'');
+  root.append(title,meta,price,description);
+  const media=item.media||[];
+  const images=media.filter(m=>m.kind==='image'&&m.url);
+  if(!images.length)(item.photoUrls||[]).forEach(url=>images.push({url}));
+  if(images.length){const gallery=document.createElement('div');gallery.className='dialog-gallery';images.slice(0,20).forEach(m=>{const img=document.createElement('img');img.src=m.url;img.alt=item.title||'Advert photo';img.loading='lazy';gallery.append(img);});root.append(gallery);}
+  media.filter(m=>m.kind==='video'&&m.url).forEach(m=>{const video=document.createElement('video');video.src=m.url;video.controls=true;video.preload='none';video.playsInline=true;video.className='dialog-video';root.append(video);});
+  const details=item.details||{};const detailEntries=Object.entries(details).filter(([k,v])=>v!==''&&v!==null&&v!==undefined);
+  if(detailEntries.length){const list=document.createElement('dl');list.className='dialog-details';detailEntries.forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k.replace(/([A-Z])/g,' $1');const dd=document.createElement('dd');dd.textContent=String(v);list.append(dt,dd);});root.append(list);}
+  if(item.contactPhone){const contact=document.createElement('a');contact.className='button button-gold';contact.href='tel:'+String(item.contactPhone).replace(/[^+0-9]/g,'');contact.textContent='Contact advertiser';root.append(contact);}
+  dialog.showModal();
 }
 function applyFilters(){
   if(!grid)return;
