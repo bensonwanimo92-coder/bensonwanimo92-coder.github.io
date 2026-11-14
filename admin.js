@@ -66,8 +66,10 @@ async function moderate(id,status,options={}){
   const update={status,reviewedAt:serverTimestamp(),reviewedBy:user.uid,updatedAt:serverTimestamp()};
   if(options.reason)update.rejectionReason=options.reason.trim().slice(0,1000);
   if(status==='approved'){update.expiresAt=Timestamp.fromDate(new Date(Date.now()+30*24*60*60*1000));update.advertiserTier=options.tier||'basic';}
+  const before=await getDoc(doc(db,'publicListings',id));
   await updateDoc(doc(db,'publicListings',id),update);
-  await loadQueue();if(status==='approved')await loadPublished();
+  try{await writeAudit(id,before.data()?.ownerUid||'',status,options.reason||'',status==='approved'?(options.tier||'basic'):(before.data()?.advertiserTier||'basic'));}catch(auditError){console.error('Moderation audit write failed',auditError);}
+  await loadQueue();if(status==='approved')await loadPublished();await loadAudit();
  }catch(e){alert('Moderation failed: '+e.message);}
 }
 async function writeAudit(listingId,ownerUid,action,reason,tier){
