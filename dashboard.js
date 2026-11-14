@@ -36,7 +36,7 @@ async function loadListings(user){
   body.replaceChildren();
   snap.forEach(item=>{
     const x=item.data(),tr=document.createElement('tr'),cell=document.createElement('td');
-    cell.innerHTML='<span class="property-cell"><i class="thumb thumb-house">✧</i><span><b>'+safe(x.title)+'</b><small>'+safe(x.town)+', '+safe(x.county)+'</small></span></span>';
+    cell.innerHTML='<span class="property-cell"><i class="thumb thumb-house">✧</i><span><b>'+safe(x.title)+'</b><small>'+safe(x.town)+', '+safe(x.county)+'</small>'+(x.rejectionReason?'<small class="review-note">Review note: '+safe(x.rejectionReason)+'</small>':'')+'</span></span>';
     const category=document.createElement('td');category.textContent=x.category||'—';
     const amount=document.createElement('td');amount.textContent=price(x.price);
     const state=document.createElement('td');state.innerHTML='<span class="status">'+safe(String(x.status||'draft').toUpperCase())+'</span>';
