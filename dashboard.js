@@ -1,4 +1,6 @@
 import { auth, db } from "./firebase-config.js";
+import { initCookieConsent } from "./consent.js";
+initCookieConsent();
 import {
   createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification,
   signInWithEmailAndPassword, signOut
