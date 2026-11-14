@@ -137,7 +137,7 @@ async function uploadListingMedia(listingId){
 function collectDetails(data){
   const keys=['size','furnishing','amenities','spaceType','floorArea','parking','zoning','developer','unitCount','completion','handover','landSize','landUse','waterAccess','titleStatus','landNotes','make','model','yearMade','mileage','fuel','transmission','bodyType','condition','cuisine','openingHours','priceRange','bookingLink','menuHighlights','brandModel','availability','serviceArea','address','stayType','capacity','checkin','facilities','warranty','delivery','serviceType','available'];
   const details={};
-  keys.forEach(key=>{const value=data.get(key);if(value!==null&&String(value).trim()!=='')details[key]=['bedrooms','bathrooms','yearMade','mileage'].includes(key)?Number(value):String(value).trim();});
+  keys.forEach(key=>{const value=data.getAll(key).find(v=>v!==null&&String(v).trim()!=='');if(value!==undefined)details[key]=['bedrooms','bathrooms','yearMade','mileage','unitCount'].includes(key)?Number(value):String(value).trim();});
   return details;
 }
 async function saveListing(intent){
@@ -153,7 +153,7 @@ async function saveListing(intent){
     createdAt:serverTimestamp(),updatedAt:serverTimestamp(),status:'draft'
   };
   const businessName=String(d.get('businessName')||'').trim();if(businessName)record.businessName=businessName;
-  const websiteUrl=String(d.get('websiteUrl')||d.get('bookingLink')||'').trim();if(websiteUrl)record.websiteUrl=websiteUrl;
+  const websiteUrl=String(d.getAll('websiteUrl').find(v=>String(v).trim())||d.get('bookingLink')||'').trim();if(websiteUrl)record.websiteUrl=websiteUrl;
   const bedrooms=d.get('bedrooms'),bathrooms=d.get('bathrooms');
   if(bedrooms!=='')record.bedrooms=Number(bedrooms);if(bathrooms!=='')record.bathrooms=Number(bathrooms);
   try{
