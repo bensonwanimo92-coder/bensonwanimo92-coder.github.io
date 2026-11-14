@@ -145,7 +145,7 @@ function collectDetails(data){
 async function editListing(id){
   try{
     const snap=await getDoc(doc(db,'publicListings',id));if(!snap.exists())throw new Error('This advert is no longer available.');
-    const x=snap.data();editingListingId=id;existingMedia=Array.isArray(x.media)?[...x.media]:[];selectedMedia=[];removedMedia=[];
+    const x=snap.data();editingListingId=id;existingMedia=Array.isArray(x.media)?[...x.media]:[...(x.photoUrls||[]).map((url,index)=>({kind:'image',url,name:'Existing photo '+(index+1)})),...(x.videoUrls||[]).map((url,index)=>({kind:'video',url,name:'Existing video '+(index+1)}))];selectedMedia=[];removedMedia=[];
     const values={title:x.title,category:x.category,adType:x.advertType,county:x.county,location:x.town,price:x.price,businessName:x.businessName,description:x.description,phone:x.contactPhone,bedrooms:x.bedrooms,bathrooms:x.bathrooms};
     Object.entries(values).forEach(([name,value])=>{const field=form.elements.namedItem(name);if(field&&value!==undefined&&value!==null)field.value=value;});
     category.dispatchEvent(new Event('change'));Object.entries(x.details||{}).forEach(([name,value])=>{const field=form.elements.namedItem(name);if(field&&value!==undefined)field.value=value;});
