@@ -32,3 +32,12 @@ This is a static GitHub Pages website. County navigation and preview interaction
 
 ## Next integration dependency
 Configure a Firebase Web App in the same Firebase project as Android. Supply only public web config (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId) and confirm Email/Password authentication is enabled. Never share a service-account JSON or private key.
+
+## Firebase marketplace integration (staged)
+- The advertiser portal now includes Firebase email/password registration and sign-in, email verification, cloud draft saving and submission for moderation.
+- The public feed is wired to read only approved, unexpired records from the separate `publicListings` collection.
+- A restricted moderation page uses the server-granted `marketplaceAdmin` custom claim to approve or reject submissions.
+- Firebase web configuration is a public client configuration; it is not a service-account credential.
+
+## Not live until backend rollout
+The website integration is staged on a feature branch. It will not be live until the website change is merged and published, the marketplace Firestore rules and indexes are merged/deployed from the SkyNest Android integration repository, and the administrator bootstrap Cloud Function is deployed and successfully invoked by the verified administrator account. Property photo uploads, payments, featured-ad billing, analytics and Android app synchronization remain future work. Do not deploy permissive rules or expose private SkyNest collections to make the website work.
