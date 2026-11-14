@@ -1,20 +1,34 @@
 # SkyNest Property Network
 
-A responsive GitHub Pages front-end for a Kenyan property discovery and advertising network.
+A mobile-friendly nationwide property discovery and advertising front-end for Kenya.
 
-## Website pages
-- `index.html`: public discovery and advertiser information page.
-- `advertiser.html`: advertiser workspace and listing-submission experience preview.
-- `styles.css`, `app.js`: public website styling and interactions.
-- `dashboard.css`, `dashboard.js`: advertiser workspace styling and preview interaction.
+## Nationwide experience
+- County navigation for all 47 counties.
+- County-aware discovery filtering alongside property type and town/estate search.
+- Advertiser listing intake includes county, town, category, advert type, price, contact and availability.
+- Responsive mobile, tablet and desktop layout.
+- Search metadata and installable web-app shell.
 
-## Current implementation status
-This is still a front-end preview. The dashboard form generates an on-screen preview only; it does not save or publish listings. Public sample property cards are clearly labelled as illustrative. Advertiser authentication, a cloud database, image storage, moderation, payment checkout, notifications and Android integration are not yet connected.
+## Frontend versus production services
+This is a static GitHub Pages website. County navigation and preview interactions run in the browser. Sample cards remain illustrative, not verified vacancies. Advertiser forms do not create accounts, save adverts or publish inventory. A frontend change alone cannot guarantee 100x traffic or listing capacity.
 
-## Backend activation required
-The Android app currently uses Firebase Auth and Cloud Firestore. To share a single property inventory safely between the website and app, configure a Firebase Web App in the same Firebase project, provide its public web config, confirm Email/Password sign-in is enabled, and review/deploy dedicated listing security rules. Public listing reads must expose only approved/published listing fields; landlord/tenant records and payment data must remain private.
+## Production architecture for 100x growth
+1. Firebase Authentication for advertisers, staff and admins; verified contact details and role claims.
+2. Dedicated publicListings collection in the existing SkyNest Firebase project, separate from tenant, landlord, payment and private management records.
+3. Workflow: draft → submitted → moderation → approved/published → paused/expired/archived. Advertisers cannot approve their own listings.
+4. Firebase Storage with per-owner paths, file validation, resizing and CDN delivery.
+5. Cursor-based pagination, Firestore composite indexes, bounded queries, caching, abuse throttling and usage monitoring.
+6. Payment checkout with server-side webhook verification; never trust a browser-side paid flag.
+7. Backend-triggered, opt-in notifications by county/category; no indiscriminate blasts.
+8. Moderation queue, reporting, audit log, backups, analytics and error monitoring.
 
-## Planned listing lifecycle
-Advertiser account → listing draft → submit for review → admin approval → public website + tenant discovery → expiry/availability update.
+## Security boundaries
+- Public clients read only approved, published, non-expired listing fields.
+- Advertisers create/edit only their own drafts and submissions.
+- Only trusted admin roles approve, publish or suspend listings.
+- Never expose tenant records, rent/payment information, credentials or service-account keys in public documents.
+- Storage rules validate ownership, MIME type and file size.
+- Test rules against the Android schema in Firebase Emulator Suite before deployment.
 
-Never put Firebase service-account keys, admin SDK credentials or other private secrets in this public repository.
+## Next integration dependency
+Configure a Firebase Web App in the same Firebase project as Android. Supply only public web config (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId) and confirm Email/Password authentication is enabled. Never share a service-account JSON or private key.

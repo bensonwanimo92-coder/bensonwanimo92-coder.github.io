@@ -1,0 +1,9 @@
+{
+  "name": "SkyNest Property Network",
+  "short_name": "SkyNest",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f6f0",
+  "theme_color": "#101914",
+  "description": "Discover and advertise property across Kenya."
+}
