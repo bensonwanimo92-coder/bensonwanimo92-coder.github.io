@@ -1,15 +1,10 @@
-import { auth, db, functions } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { httpsCallable } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-functions.js";
 import { collection, getDocs, orderBy, query, serverTimestamp, Timestamp, updateDoc, where, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 const $=id=>document.getElementById(id);
 let user=null,admin=false;
 $('year').textContent=new Date().getFullYear();
 $('signOutButton').addEventListener('click',async()=>{await signOut(auth);location.href='advertiser.html';});
-$('bootstrapButton').addEventListener('click',async()=>{
-  try{$('accessStatus').textContent='Requesting secure administrator activation…';const fn=httpsCallable(functions,'bootstrapMarketplaceAdmin');await fn({});await auth.currentUser.getIdToken(true);await checkAccess();}
-  catch(e){$('accessStatus').textContent='Administrator activation is not available yet: '+e.message;}
-});
 onAuthStateChanged(auth,async u=>{
   user=u;
   if(!u){$('accessStatus').textContent='Please sign in with your SkyNest account first.';const a=document.createElement('a');a.href='advertiser.html';a.textContent='Open advertiser sign-in';$('accessPanel').append(a);$('bootstrapButton').hidden=true;return;}
@@ -18,10 +13,11 @@ onAuthStateChanged(auth,async u=>{
 async function checkAccess(){
   if(!user)return;
   await user.reload();
-  const token=await user.getIdTokenResult(true);
-  admin=token.claims.marketplaceAdmin===true;
-  if(admin){$('accessStatus').textContent='Administrator access confirmed for '+user.email+'.';$('bootstrapButton').hidden=true;$('queue').hidden=false;await loadQueue();}
-  else{$('accessStatus').textContent='Signed in as '+user.email+'. This account does not yet carry the marketplace administrator claim.';$('bootstrapButton').hidden=false;$('queue').hidden=true;}
+  user=auth.currentUser;
+  admin=!!user && user.uid==='PN9bC3ZzgSaOK1JjG4TcjCU9Grx1' &&
+    user.email==='bensonwanimo92@gmail.com' && user.emailVerified===true;
+  if(admin){$('accessStatus').textContent='Administrator access confirmed for the verified initial administrator account.';$('queue').hidden=false;await loadQueue();}
+  else{$('accessStatus').textContent='This account is not the verified initial marketplace administrator. Access is restricted.';$('queue').hidden=true;}
 }
 $('refreshButton').addEventListener('click',loadQueue);
 async function loadQueue(){
