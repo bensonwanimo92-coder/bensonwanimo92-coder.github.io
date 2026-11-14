@@ -1,22 +1,20 @@
 # SkyNest Property Network
 
-Responsive GitHub Pages front-end foundation for a property discovery and advertising network.
+A responsive GitHub Pages front-end for a Kenyan property discovery and advertising network.
 
-## Included
-- Responsive landing page and mobile navigation.
-- Discovery/search interface with clearly labelled illustrative sample cards.
-- Sections for landlords, estate agents, developers and commercial advertisers.
-- Advertiser interest form that prepares an email to the site contact.
-- Accessibility basics, metadata and reduced-motion support.
+## Website pages
+- `index.html`: public discovery and advertiser information page.
+- `advertiser.html`: advertiser workspace and listing-submission experience preview.
+- `styles.css`, `app.js`: public website styling and interactions.
+- `dashboard.css`, `dashboard.js`: advertiser workspace styling and preview interaction.
 
-## Important status
-This is a front-end foundation only. Sample cards are not live or verified vacancies. The advertiser form uses a mailto hand-off and does not store submissions. There is no payment processing, advertiser login, listing database, moderation dashboard, automated app notification or app/API integration yet.
+## Current implementation status
+This is still a front-end preview. The dashboard form generates an on-screen preview only; it does not save or publish listings. Public sample property cards are clearly labelled as illustrative. Advertiser authentication, a cloud database, image storage, moderation, payment checkout, notifications and Android integration are not yet connected.
 
-## Production roadmap
-1. Secure backend and shared listing database.
-2. Advertiser accounts, listing submission, image storage and admin review.
-3. Listing expiry, availability status, fraud reporting and moderation.
-4. Payment provider integration after business and compliance decisions.
-5. Connect approved listings to SkyNest Android Tenant Discovery and notification preferences.
+## Backend activation required
+The Android app currently uses Firebase Auth and Cloud Firestore. To share a single property inventory safely between the website and app, configure a Firebase Web App in the same Firebase project, provide its public web config, confirm Email/Password sign-in is enabled, and review/deploy dedicated listing security rules. Public listing reads must expose only approved/published listing fields; landlord/tenant records and payment data must remain private.
 
-Never put private keys or service credentials in this public repository.
+## Planned listing lifecycle
+Advertiser account → listing draft → submit for review → admin approval → public website + tenant discovery → expiry/availability update.
+
+Never put Firebase service-account keys, admin SDK credentials or other private secrets in this public repository.
