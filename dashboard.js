@@ -166,8 +166,8 @@ async function saveListing(intent){
     contactPhone:String(d.get('phone')).trim(),photoUrls:[],media:[],details:collectDetails(d),
     updatedAt:serverTimestamp(),status:'draft'
   };
-  const businessName=String(d.get('businessName')||'').trim();if(businessName)record.businessName=businessName;
-  const websiteUrl=String(d.getAll('websiteUrl').find(v=>String(v).trim())||d.get('bookingLink')||'').trim();if(websiteUrl)record.websiteUrl=websiteUrl;
+  record.businessName=String(d.get('businessName')||'').trim();
+  record.websiteUrl=String(d.getAll('websiteUrl').find(v=>String(v).trim())||d.get('bookingLink')||'').trim();
   const bedrooms=d.get('bedrooms'),bathrooms=d.get('bathrooms');
   if(bedrooms!=='')record.bedrooms=Number(bedrooms);if(bathrooms!=='')record.bathrooms=Number(bathrooms);
   try{
