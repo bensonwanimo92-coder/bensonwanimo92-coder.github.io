@@ -37,7 +37,10 @@ async function loadQueue(){
       const reject=document.createElement('button');reject.className='button';reject.textContent='Reject';
       approve.addEventListener('click',()=>moderate(s.id,'approved'));
       reject.addEventListener('click',()=>moderate(s.id,'rejected'));
-      card.append(title,details,description,approve,reject);root.append(card);
+      const gallery=document.createElement('div');gallery.style.cssText='display:flex;gap:10px;flex-wrap:wrap;margin:12px 0';
+      (Array.isArray(x.photoUrls)?x.photoUrls:[]).forEach(url=>{const image=document.createElement('img');image.src=url;image.alt='Advert photo';image.loading='lazy';image.style.cssText='width:130px;height:95px;object-fit:cover;border-radius:5px';gallery.append(image);});
+      (Array.isArray(x.videoUrls)?x.videoUrls:[]).forEach(url=>{const video=document.createElement('video');video.src=url;video.controls=true;video.preload='metadata';video.style.cssText='width:180px;max-height:120px;border-radius:5px';gallery.append(video);});
+      card.append(title,details,description);if(gallery.childElementCount)card.append(gallery);card.append(approve,reject);root.append(card);
     });
   }catch(e){$('queueStatus').textContent='Could not load moderation queue: '+e.message;}
 }
