@@ -20,7 +20,8 @@ async function checkAccess(){
  else{$('accessStatus').textContent='This account is not an authorised marketplace administrator. Access is restricted.';$('queue').hidden=true;$('published').hidden=true;}
 }
 $('refreshButton').addEventListener('click',loadQueue);
-$('refreshPublishedButton').addEventListener('click',loadPublished);\n$('refreshAuditButton').addEventListener('click',loadAudit);
+$('refreshPublishedButton').addEventListener('click',loadPublished);
+$('refreshAuditButton').addEventListener('click',loadAudit);
 function makeMediaPreview(item){
  const wrap=document.createElement('div');wrap.className='moderation-media';
  (item.media||[]).forEach(m=>{
