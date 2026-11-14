@@ -9,6 +9,7 @@ import {
 
 const $=id=>document.getElementById(id);
 const form=$('listingForm'), authForm=$('authForm');
+authForm?.addEventListener('submit',e=>e.preventDefault());
 let currentUser=null;
 function status(message){$('authStatus').textContent=message;}
 function price(value){return new Intl.NumberFormat('en-KE',{style:'currency',currency:'KES',maximumFractionDigits:0}).format(Number(value)||0);}
