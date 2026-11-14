@@ -16,8 +16,8 @@ async function checkAccess(){
  if(!user)return;await user.reload();user=auth.currentUser;
  const token=await user.getIdTokenResult();
  admin=token.claims.marketplaceAdmin===true||(user.uid==='PN9bC3ZzgSaOK1JjG4TcjCU9Grx1'&&user.email==='bensonwanimo92@gmail.com'&&user.emailVerified===true);
- if(admin){$('accessStatus').textContent='Administrator access confirmed. Review and publishing controls are enabled.';$('queue').hidden=false;$('published').hidden=false;await Promise.all([loadQueue(),loadPublished(),loadAudit()]);}
- else{$('accessStatus').textContent='This account is not an authorised marketplace administrator. Access is restricted.';$('queue').hidden=true;$('published').hidden=true;}
+ if(admin){$('accessStatus').textContent='Administrator access confirmed. Review and publishing controls are enabled.';$('queue').hidden=false;$('published').hidden=false;$('audit').hidden=false;await Promise.all([loadQueue(),loadPublished(),loadAudit()]);}
+ else{$('accessStatus').textContent='This account is not an authorised marketplace administrator. Access is restricted.';$('queue').hidden=true;$('published').hidden=true;$('audit').hidden=true;}
 }
 $('refreshButton').addEventListener('click',loadQueue);
 $('refreshPublishedButton').addEventListener('click',loadPublished);
