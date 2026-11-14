@@ -151,7 +151,7 @@ async function editListing(id){
     category.dispatchEvent(new Event('change'));Object.entries(x.details||{}).forEach(([name,value])=>{const field=form.elements.namedItem(name);if(field&&value!==undefined)field.value=value;});
     if(x.websiteUrl){const field=form.elements.namedItem('websiteUrl');if(field)field.value=x.websiteUrl;}
     $('uploadStatus').textContent='Editing existing advert. Current media is retained unless you remove it.';
-    $('submitListingButton').textContent='Resubmit for review ↗';form.scrollIntoView({behavior:'smooth',block:'start'});renderMediaPreview();
+    $('submitListingButton').textContent='Resubmit for review ↗';$('cancelEditButton').hidden=false;$('submitListingButton').textContent='Resubmit for review ↗';form.scrollIntoView({behavior:'smooth',block:'start'});renderMediaPreview();
   }catch(e){alert('Could not open advert for editing: '+e.message);}
 }
 async function saveListing(intent){
@@ -164,7 +164,7 @@ async function saveListing(intent){
     advertType:String(d.get('adType')),county:String(d.get('county')),town:String(d.get('location')).trim(),
     price:priceValue,currency:'KES',description:String(d.get('description')).trim(),
     contactPhone:String(d.get('phone')).trim(),photoUrls:[],media:[],details:collectDetails(d),
-    createdAt:serverTimestamp(),updatedAt:serverTimestamp(),status:'draft'
+    updatedAt:serverTimestamp(),status:'draft'
   };
   const businessName=String(d.get('businessName')||'').trim();if(businessName)record.businessName=businessName;
   const websiteUrl=String(d.getAll('websiteUrl').find(v=>String(v).trim())||d.get('bookingLink')||'').trim();if(websiteUrl)record.websiteUrl=websiteUrl;
@@ -174,21 +174,22 @@ async function saveListing(intent){
     $('uploadStatus').textContent=editingListingId?'Updating your advert…':'Creating your secure advert draft…';
     let listingId=editingListingId;
     if(!listingId){record.createdAt=serverTimestamp();const listingRef=await addDoc(collection(db,'publicListings'),record);listingId=listingRef.id;}
-    else {record.status=intent==='submit'?'pending':'draft';record.updatedAt=serverTimestamp();if(intent==='submit')record.submittedAt=serverTimestamp();await updateDoc(doc(db,'publicListings',listingId),record);}
+    else {record.status='draft';record.updatedAt=serverTimestamp();await updateDoc(doc(db,'publicListings',listingId),record);}
     const uploaded=await uploadListingMedia(listingId);
     const media=[...existingMedia,...uploaded];
     const photoUrls=media.filter(m=>m.kind==='image').map(m=>m.url);
     const videoUrls=media.filter(m=>m.kind==='video').map(m=>m.url);
     const patch={media,photoUrls,videoUrls,updatedAt:serverTimestamp()};
-    if(intent==='submit'&&!editingListingId){patch.status='pending';patch.submittedAt=serverTimestamp();}
-    if(media.some(m=>m.kind==='image'))patch.coverImagePath=media.find(m=>m.kind==='image').storagePath;
+    if(intent==='submit'){patch.status='pending';patch.submittedAt=serverTimestamp();}
+    patch.coverImagePath=media.find(m=>m.kind==='image')?.storagePath||'';
     await updateDoc(doc(db,'publicListings',listingId),patch);
     for(const old of removedMedia){if(old.storagePath){try{await deleteObject(storageRef(storage,old.storagePath));}catch(err){console.warn('Old media cleanup skipped',err);}}}
     $('uploadStatus').textContent=media.length+' media file(s) saved. '+(intent==='submit'?'Your advert is awaiting moderation.':'Your draft is saved.');
-    form.reset();selectedMedia=[];existingMedia=[];removedMedia=[];editingListingId=null;renderMediaPreview();$('submitListingButton').textContent='Submit for review ↗';document.querySelectorAll('.category-fields').forEach(el=>el.hidden=true);
+    form.reset();selectedMedia=[];existingMedia=[];removedMedia=[];editingListingId=null;renderMediaPreview();$('submitListingButton').textContent='Submit for review ↗';$('cancelEditButton').hidden=true;document.querySelectorAll('.category-fields').forEach(el=>el.hidden=true);
     await refresh();
   }catch(e){console.error(e);$('uploadStatus').textContent='Could not complete the advert: '+e.message;alert('SkyNest could not save this advert: '+e.message);}
 }
 form.addEventListener('submit',e=>{e.preventDefault();saveListing('draft');});
 $('submitListingButton').addEventListener('click',()=>saveListing('submit'));
+$('cancelEditButton').addEventListener('click',()=>{form.reset();selectedMedia=[];existingMedia=[];removedMedia=[];editingListingId=null;$('cancelEditButton').hidden=true;$('submitListingButton').textContent='Submit for review ↗';$('uploadStatus').textContent='Edit cancelled.';renderMediaPreview();document.querySelectorAll('.category-fields').forEach(el=>el.hidden=true);});
 $('year').textContent=new Date().getFullYear();
