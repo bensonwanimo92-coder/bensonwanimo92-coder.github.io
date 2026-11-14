@@ -28,7 +28,7 @@ jobs:
       - name: Check JavaScript module syntax
         run: |
           set -euo pipefail
-          for file in app.js dashboard.js admin.js firebase-config.js; do
+          for file in app.js dashboard.js admin.js consent.js firebase-config.js; do
             node --input-type=module --check < "$file"
           done
       - name: Check required marketplace pages
@@ -36,6 +36,10 @@ jobs:
           test -s index.html
           test -s advertiser.html
           test -s admin.html
+          test -s privacy.html
+          grep -q 'mediaFiles' advertiser.html
+          grep -q 'changes_requested' admin.js
+          grep -q 'listing_media' dashboard.js
           grep -q 'publicListings' app.js
           grep -q 'PN9bC3ZzgSaOK1JjG4TcjCU9Grx1' admin.js
           grep -q 'emailVerified' dashboard.js
