@@ -79,7 +79,7 @@ const categoryPanels={
   Hospitality:['hospitalityFields'],Products:['productFields'],Services:['serviceFields'],Luxury:['generalFields']
 };
 category?.addEventListener('change',()=>{
-  document.querySelectorAll('.category-fields').forEach(el=>el.hidden=true);
+  document.querySelectorAll('.category-fields').forEach(el=>{el.hidden=true;el.querySelectorAll('input,select,textarea').forEach(field=>{field.value='';});});
   (categoryPanels[category.value]||[]).forEach(id=>$(id).hidden=false);
 });
 function videoDuration(file){
@@ -163,7 +163,7 @@ async function saveListing(intent){
     ownerUid:currentUser.uid,title:String(d.get('title')).trim(),category:String(d.get('category')),
     advertType:String(d.get('adType')),county:String(d.get('county')),town:String(d.get('location')).trim(),
     price:priceValue,currency:'KES',description:String(d.get('description')).trim(),
-    contactPhone:String(d.get('phone')).trim(),photoUrls:[],media:[],details:collectDetails(d),
+    contactPhone:String(d.get('phone')).trim(),details:collectDetails(d),
     updatedAt:serverTimestamp(),status:'draft'
   };
   record.businessName=String(d.get('businessName')||'').trim();
@@ -173,7 +173,7 @@ async function saveListing(intent){
   try{
     $('uploadStatus').textContent=editingListingId?'Updating your advert…':'Creating your secure advert draft…';
     let listingId=editingListingId;
-    if(!listingId){record.createdAt=serverTimestamp();const listingRef=await addDoc(collection(db,'publicListings'),record);listingId=listingRef.id;}
+    if(!listingId){record.photoUrls=[];record.media=[];record.createdAt=serverTimestamp();const listingRef=await addDoc(collection(db,'publicListings'),record);listingId=listingRef.id;}
     else {record.status='draft';record.updatedAt=serverTimestamp();await updateDoc(doc(db,'publicListings',listingId),record);}
     const uploaded=await uploadListingMedia(listingId);
     const media=[...existingMedia,...uploaded];
