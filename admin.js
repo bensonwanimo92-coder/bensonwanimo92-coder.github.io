@@ -7,7 +7,7 @@ $('year').textContent=new Date().getFullYear();
 $('signOutButton').addEventListener('click',async()=>{await signOut(auth);location.href='advertiser.html';});
 onAuthStateChanged(auth,async u=>{
   user=u;
-  if(!u){$('accessStatus').textContent='Please sign in with your SkyNest account first.';const a=document.createElement('a');a.href='advertiser.html';a.textContent='Open advertiser sign-in';$('accessPanel').append(a);$('bootstrapButton').hidden=true;return;}
+  if(!u){$('accessStatus').textContent='Please sign in with your SkyNest account first.';const a=document.createElement('a');a.href='advertiser.html';a.textContent='Open advertiser sign-in';$('accessPanel').append(a)return;}
   await checkAccess();
 });
 async function checkAccess(){
