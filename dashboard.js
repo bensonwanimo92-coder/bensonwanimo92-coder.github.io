@@ -18,8 +18,8 @@ function setWorkspace(user){
   $('workspaceName').textContent=user?((user.displayName||user.email?.split('@')[0]||'Advertiser')):'Guest workspace';
   $('workspaceEmail').textContent=user?user.email:'Sign in to manage adverts';
   $('signOutButton').hidden=!user;
-  $('authPanel').hidden=!!user;
-  if(user){status(user.emailVerified?'Signed in. Your advertiser workspace is ready.':'Signed in, but email verification is still required. Check your inbox.');}
+  $('authPanel').hidden=!!user && user.emailVerified;
+  if(user){status(user.emailVerified?'Signed in. Your advertiser workspace is ready.':'Signed in, but email verification is still required. Check your inbox.');$('resendVerification').hidden=user.emailVerified;$('refreshVerification').hidden=user.emailVerified;}
 }
 async function loadListings(user){
   const body=$('myListingsBody');
@@ -60,7 +60,7 @@ $('resendVerification').addEventListener('click',async()=>{
   catch(e){status(e.message);}
 });
 $('signOutButton').addEventListener('click',()=>signOut(auth));
-onAuthStateChanged(auth,async user=>{
+$('refreshVerification').addEventListener('click',async()=>{try{await auth.currentUser.reload();const fresh=auth.currentUser;setWorkspace(fresh);if(fresh.emailVerified){await refresh();}else{status('Email is not verified yet. Open the link sent to your inbox first.');}}catch(e){status(e.message);}});\nonAuthStateChanged(auth,async user=>{
   setWorkspace(user);
   if(user){$('resendVerification').hidden=user.emailVerified;try{await refresh();}catch(e){console.error(e);$('myListingsBody').innerHTML='<tr><td colspan="5">Could not load listings. Check the marketplace Firestore rules and index.</td></tr>';}}
 });
