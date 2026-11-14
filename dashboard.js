@@ -73,9 +73,9 @@ onAuthStateChanged(auth,async user=>{
 });
 const category=$('categorySelect');
 const categoryPanels={
-  Residential:['residentialFields'],Commercial:['residentialFields'],Development:['residentialFields'],
+  Residential:['residentialFields'],Commercial:['commercialFields'],Development:['developmentFields'],
   Land:['landFields'],Vehicles:['vehicleFields'],Restaurants:['restaurantFields'],
-  Hospitality:['generalFields'],Products:['generalFields'],Services:['generalFields'],Luxury:['generalFields']
+  Hospitality:['hospitalityFields'],Products:['productFields'],Services:['serviceFields'],Luxury:['generalFields']
 };
 category?.addEventListener('change',()=>{
   document.querySelectorAll('.category-fields').forEach(el=>el.hidden=true);
@@ -135,7 +135,7 @@ async function uploadListingMedia(listingId){
   return uploaded;
 }
 function collectDetails(data){
-  const keys=['size','furnishing','amenities','landSize','landUse','waterAccess','titleStatus','landNotes','make','model','yearMade','mileage','fuel','transmission','bodyType','condition','cuisine','openingHours','priceRange','bookingLink','menuHighlights','brandModel','availability','serviceArea','address'];
+  const keys=['size','furnishing','amenities','spaceType','floorArea','parking','zoning','developer','unitCount','completion','handover','landSize','landUse','waterAccess','titleStatus','landNotes','make','model','yearMade','mileage','fuel','transmission','bodyType','condition','cuisine','openingHours','priceRange','bookingLink','menuHighlights','brandModel','availability','serviceArea','address','stayType','capacity','checkin','facilities','warranty','delivery','serviceType','available'];
   const details={};
   keys.forEach(key=>{const value=data.get(key);if(value!==null&&String(value).trim()!=='')details[key]=['bedrooms','bathrooms','yearMade','mileage'].includes(key)?Number(value):String(value).trim();});
   return details;
