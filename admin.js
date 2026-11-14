@@ -1,4 +1,6 @@
 import { auth, db } from "./firebase-config.js";
+import { initCookieConsent } from "./consent.js";
+initCookieConsent();
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { collection, getDocs, orderBy, query, serverTimestamp, Timestamp, updateDoc, where, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 const $=id=>document.getElementById(id);
