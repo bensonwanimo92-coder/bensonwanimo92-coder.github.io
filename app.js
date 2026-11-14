@@ -55,9 +55,15 @@ document.querySelectorAll('[data-category]').forEach(link=>link.addEventListener
 async function loadPublicListings(){
   if(!grid)return;
   try{
-    const q=query(collection(db,'publicListings'),where('status','==','approved'),where('expiresAt','>',Timestamp.now()),orderBy('expiresAt','asc'),orderBy('createdAt','desc'),limit(60));
-    const snap=await getDocs(q);
-    liveListings=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const base=collection(db,'publicListings'),now=Timestamp.now();
+    const makeTierQuery=tier=>query(base,where('status','==','approved'),where('advertiserTier','==',tier),where('expiresAt','>',now),orderBy('expiresAt','asc'),orderBy('createdAt','desc'),limit(20));
+    const [premiumSnap,standardSnap,basicSnap,legacySnap]=await Promise.all([
+      getDocs(makeTierQuery('premium')),getDocs(makeTierQuery('standard')),getDocs(makeTierQuery('basic')),
+      getDocs(query(base,where('status','==','approved'),where('expiresAt','>',now),orderBy('expiresAt','asc'),orderBy('createdAt','desc'),limit(20)))
+    ]);
+    const byId=new Map();
+    for(const snap of [premiumSnap,standardSnap,basicSnap,legacySnap])for(const d of snap.docs){const item={id:d.id,...d.data()};if(!item.advertiserTier)item.advertiserTier='basic';byId.set(d.id,item);}
+    liveListings=[...byId.values()];
     liveListings.sort((a,b)=>tierRank(a.advertiserTier)-tierRank(b.advertiserTier)||((b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)));
     if(liveListings.length)grid.replaceChildren(...liveListings.map(makeCard));
     else grid.innerHTML='<article class="property-card"><div class="property-info"><div class="property-meta">SKYNEST MARKETPLACE</div><h3>Listings are opening soon</h3><p>Approved adverts will appear here after the moderation team reviews them.</p></div></article>';
