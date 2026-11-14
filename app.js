@@ -37,7 +37,7 @@ function makeCard(item){
   const bottom=document.createElement('div');bottom.className='property-bottom';
   const price=document.createElement('strong');price.textContent=money(item.price)+(item.advertType==='For rent'?' / month':'');
   const contact=document.createElement('a');contact.className='round-arrow';contact.textContent='Contact ↗';contact.href='tel:'+String(item.contactPhone||'').replace(/[^+0-9]/g,'');contact.setAttribute('aria-label','Call advertiser');
-  bottom.append(price,contact);info.append(meta,title,desc,bottom);card.append(photo,info);return card;
+  bottom.append(price,contact);info.prepend(meta,title,desc);info.append(bottom);card.append(photo,info);return card;
 }
 function applyFilters(){
   if(!grid)return;
