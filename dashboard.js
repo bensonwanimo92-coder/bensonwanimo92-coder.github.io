@@ -6,16 +6,16 @@ import {
   signInWithEmailAndPassword, signOut
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {
-  addDoc, collection, getDocs, orderBy, query, serverTimestamp, updateDoc, where, doc
+  addDoc, collection, getDocs, getDoc, orderBy, query, serverTimestamp, updateDoc, where, doc
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 import {
-  getStorage, ref as storageRef, uploadBytes, getDownloadURL
+  getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
 const $=id=>document.getElementById(id);
 const form=$('listingForm'), authForm=$('authForm'), storage=getStorage();
 authForm?.addEventListener('submit',e=>e.preventDefault());
-let currentUser=null, selectedMedia=[];
+let currentUser=null, selectedMedia=[], existingMedia=[], removedMedia=[], editingListingId=null;
 const MAX_PHOTOS=10,MAX_VIDEOS=3,MAX_PHOTO_BYTES=8*1024*1024,MAX_VIDEO_BYTES=20*1024*1024,MAX_VIDEO_SECONDS=60;
 function status(message){$('authStatus').textContent=message;}
 function price(value){return new Intl.NumberFormat('en-KE',{style:'currency',currency:'KES',maximumFractionDigits:0}).format(Number(value)||0);}
@@ -41,6 +41,7 @@ async function loadListings(user){
     const amount=document.createElement('td');amount.textContent=price(x.price);
     const state=document.createElement('td');state.innerHTML='<span class="status">'+safe(String(x.status||'draft').toUpperCase())+'</span>';
     const updated=document.createElement('td');updated.textContent=x.updatedAt?.toDate?x.updatedAt.toDate().toLocaleDateString():'Just now';
+    if(['draft','rejected','changes_requested'].includes(x.status)){const edit=document.createElement('button');edit.type='button';edit.className='button';edit.textContent='Edit / resubmit';edit.addEventListener('click',()=>editListing(item.id));cell.append(edit);}
     tr.append(cell,category,amount,state,updated);body.append(tr);
   });
 }
@@ -90,6 +91,7 @@ function videoDuration(file){
 }
 function renderMediaPreview(){
   const root=$('mediaPreview');root.replaceChildren();
+  existingMedia.forEach((file,index)=>{const item=document.createElement('div');item.className='media-preview-item';const label=document.createElement('span');label.textContent=(file.kind==='video'?'EXISTING VIDEO · ':'EXISTING PHOTO · ')+file.name;const remove=document.createElement('button');remove.type='button';remove.textContent='Remove';remove.addEventListener('click',()=>{removedMedia.push(file);existingMedia.splice(index,1);renderMediaPreview();});item.append(label,remove);root.append(item);});
   selectedMedia.forEach((file,index)=>{
     const item=document.createElement('div');item.className='media-preview-item';
     const label=document.createElement('span');label.textContent=(file.type.startsWith('video/')?'VIDEO · ':'PHOTO · ')+file.name;
@@ -140,6 +142,18 @@ function collectDetails(data){
   keys.forEach(key=>{const value=data.getAll(key).find(v=>v!==null&&String(v).trim()!=='');if(value!==undefined)details[key]=['bedrooms','bathrooms','yearMade','mileage','unitCount'].includes(key)?Number(value):String(value).trim();});
   return details;
 }
+async function editListing(id){
+  try{
+    const snap=await getDoc(doc(db,'publicListings',id));if(!snap.exists())throw new Error('This advert is no longer available.');
+    const x=snap.data();editingListingId=id;existingMedia=Array.isArray(x.media)?[...x.media]:[];selectedMedia=[];removedMedia=[];
+    const values={title:x.title,category:x.category,adType:x.advertType,county:x.county,location:x.town,price:x.price,businessName:x.businessName,description:x.description,phone:x.contactPhone,bedrooms:x.bedrooms,bathrooms:x.bathrooms};
+    Object.entries(values).forEach(([name,value])=>{const field=form.elements.namedItem(name);if(field&&value!==undefined&&value!==null)field.value=value;});
+    category.dispatchEvent(new Event('change'));Object.entries(x.details||{}).forEach(([name,value])=>{const field=form.elements.namedItem(name);if(field&&value!==undefined)field.value=value;});
+    if(x.websiteUrl){const field=form.elements.namedItem('websiteUrl');if(field)field.value=x.websiteUrl;}
+    $('uploadStatus').textContent='Editing existing advert. Current media is retained unless you remove it.';
+    $('submitListingButton').textContent='Resubmit for review ↗';form.scrollIntoView({behavior:'smooth',block:'start'});renderMediaPreview();
+  }catch(e){alert('Could not open advert for editing: '+e.message);}
+}
 async function saveListing(intent){
   if(!currentUser){alert('Sign in before saving an advert.');return;}
   if(!currentUser.emailVerified){alert('Please verify your email before creating adverts.');return;}
@@ -157,17 +171,21 @@ async function saveListing(intent){
   const bedrooms=d.get('bedrooms'),bathrooms=d.get('bathrooms');
   if(bedrooms!=='')record.bedrooms=Number(bedrooms);if(bathrooms!=='')record.bathrooms=Number(bathrooms);
   try{
-    $('uploadStatus').textContent='Creating your secure advert draft…';
-    const listingRef=await addDoc(collection(db,'publicListings'),record);
-    const media=await uploadListingMedia(listingRef.id);
+    $('uploadStatus').textContent=editingListingId?'Updating your advert…':'Creating your secure advert draft…';
+    let listingId=editingListingId;
+    if(!listingId){record.createdAt=serverTimestamp();const listingRef=await addDoc(collection(db,'publicListings'),record);listingId=listingRef.id;}
+    else {record.status=intent==='submit'?'pending':'draft';record.updatedAt=serverTimestamp();if(intent==='submit')record.submittedAt=serverTimestamp();await updateDoc(doc(db,'publicListings',listingId),record);}
+    const uploaded=await uploadListingMedia(listingId);
+    const media=[...existingMedia,...uploaded];
     const photoUrls=media.filter(m=>m.kind==='image').map(m=>m.url);
     const videoUrls=media.filter(m=>m.kind==='video').map(m=>m.url);
     const patch={media,photoUrls,videoUrls,updatedAt:serverTimestamp()};
-    if(media.length)patch.coverImagePath=media.find(m=>m.kind==='image')?.storagePath||'';
-    if(intent==='submit'){patch.status='pending';patch.submittedAt=serverTimestamp();}
-    await updateDoc(doc(db,'publicListings',listingRef.id),patch);
-    $('uploadStatus').textContent=media.length+' media file(s) saved. '+(intent==='submit'?'Your advert is now awaiting moderation.':'Your draft is saved.');
-    form.reset();selectedMedia=[];renderMediaPreview();document.querySelectorAll('.category-fields').forEach(el=>el.hidden=true);
+    if(intent==='submit'&&!editingListingId){patch.status='pending';patch.submittedAt=serverTimestamp();}
+    if(media.some(m=>m.kind==='image'))patch.coverImagePath=media.find(m=>m.kind==='image').storagePath;
+    await updateDoc(doc(db,'publicListings',listingId),patch);
+    for(const old of removedMedia){if(old.storagePath){try{await deleteObject(storageRef(storage,old.storagePath));}catch(err){console.warn('Old media cleanup skipped',err);}}}
+    $('uploadStatus').textContent=media.length+' media file(s) saved. '+(intent==='submit'?'Your advert is awaiting moderation.':'Your draft is saved.');
+    form.reset();selectedMedia=[];existingMedia=[];removedMedia=[];editingListingId=null;renderMediaPreview();$('submitListingButton').textContent='Submit for review ↗';document.querySelectorAll('.category-fields').forEach(el=>el.hidden=true);
     await refresh();
   }catch(e){console.error(e);$('uploadStatus').textContent='Could not complete the advert: '+e.message;alert('SkyNest could not save this advert: '+e.message);}
 }
