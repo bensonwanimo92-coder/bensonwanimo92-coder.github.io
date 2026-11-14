@@ -79,8 +79,8 @@ async function saveListing(intent){
     status:'draft',createdAt:serverTimestamp(),updatedAt:serverTimestamp()
   };
   const estate=d.get('estate');if(estate)record.estate=String(estate).trim();
-  const bedrooms=d.get('bedrooms');if(bedrooms!=='')record.bedrooms=Number(bedrooms);
-  const bathrooms=d.get('bathrooms');if(bathrooms!=='')record.bathrooms=Number(bathrooms);
+  const bedrooms=d.get('bedrooms');if(bedrooms)record.bedrooms=Number(bedrooms);
+  const bathrooms=d.get('bathrooms');if(bathrooms)record.bathrooms=Number(bathrooms);
   try{
     const ref=await addDoc(collection(db,'publicListings'),record);
     if(intent==='submit'){
