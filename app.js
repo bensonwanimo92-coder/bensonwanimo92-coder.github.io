@@ -21,7 +21,7 @@ function makeCard(item){
   if(firstImage){const img=document.createElement('img');img.src=firstImage;img.alt=item.title||'SkyNest advert';img.loading='lazy';photo.append(img);}
   else photo.classList.add('photo-fallback');
   const tier=String(item.advertiserTier||'basic').toLowerCase();
-  if(tier!=='basic'){const tierTag=document.createElement('span');tierTag.className='tier-tag tier-'+tier;tierTag.textContent=tier.toUpperCase();photo.append(tierTag);}
+  if(tier!=='basic'){const tierTag=document.createElement('span');tierTag.className='tier-tag tier-'+tier;tierTag.textContent=tier.toUpperCase()+' PLACEMENT';photo.append(tierTag);}
   const tag=document.createElement('span');tag.className='photo-tag';tag.textContent='APPROVED ADVERT';photo.append(tag);
   if((item.media||[]).some(m=>m.kind==='video')){const video=document.createElement('span');video.className='video-tag';video.textContent='▶ VIDEO TOUR';photo.append(video);}
   const info=document.createElement('div');info.className='property-info';
