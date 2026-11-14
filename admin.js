@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase-config.js";
 import { initCookieConsent } from "./consent.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { collection, getDocs, orderBy, query, serverTimestamp, Timestamp, updateDoc, where, doc, limit } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { addDoc, collection, getDocs, orderBy, query, serverTimestamp, Timestamp, updateDoc, where, doc, limit } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 initCookieConsent();
 const $=id=>document.getElementById(id);
 let user=null,admin=false;
@@ -16,7 +16,7 @@ async function checkAccess(){
  if(!user)return;await user.reload();user=auth.currentUser;
  const token=await user.getIdTokenResult();
  admin=token.claims.marketplaceAdmin===true||(user.uid==='PN9bC3ZzgSaOK1JjG4TcjCU9Grx1'&&user.email==='bensonwanimo92@gmail.com'&&user.emailVerified===true);
- if(admin){$('accessStatus').textContent='Administrator access confirmed. Review and publishing controls are enabled.';$('queue').hidden=false;$('published').hidden=false;await Promise.all([loadQueue(),loadPublished()]);}
+ if(admin){$('accessStatus').textContent='Administrator access confirmed. Review and publishing controls are enabled.';$('queue').hidden=false;$('published').hidden=false;await Promise.all([loadQueue(),loadPublished(),loadAudit()]);}
  else{$('accessStatus').textContent='This account is not an authorised marketplace administrator. Access is restricted.';$('queue').hidden=true;$('published').hidden=true;}
 }
 $('refreshButton').addEventListener('click',loadQueue);
@@ -69,6 +69,26 @@ async function moderate(id,status,options={}){
   await loadQueue();if(status==='approved')await loadPublished();
  }catch(e){alert('Moderation failed: '+e.message);}
 }
+async function writeAudit(listingId,ownerUid,action,reason,tier){
+ if(!admin||!user)return;
+ await addDoc(collection(db,'marketplaceModerationLogs'),{
+  listingId,ownerUid,action,reason:String(reason||'').slice(0,1000),
+  advertiserTier:tier||'basic',actorUid:user.uid,actorEmail:user.email||'',createdAt:serverTimestamp()
+ });
+}
+async function loadAudit(){
+ if(!admin)return;const root=$('auditCards');if(!root)return;root.replaceChildren();$('auditStatus').textContent='Loading audit history…';
+ try{
+  const snap=await getDocs(query(collection(db,'marketplaceModerationLogs'),orderBy('createdAt','desc'),limit(30)));
+  $('auditStatus').textContent=snap.size+' recent moderation action(s).';
+  if(snap.empty){root.textContent='No moderation actions recorded yet.';return;}
+  snap.forEach(s=>{const x=s.data(),row=document.createElement('article');row.className='published-row';
+   const summary=document.createElement('div');const title=document.createElement('b');title.textContent=(x.action||'action').replaceAll('_',' ').toUpperCase()+' · '+(x.listingId||'');
+   const meta=document.createElement('small');meta.textContent=[x.actorEmail,x.advertiserTier,x.reason].filter(Boolean).join(' · ');
+   summary.append(title,meta);row.append(summary);root.append(row);
+  });
+ }catch(e){$('auditStatus').textContent='Could not load audit history: '+e.message;}
+}
 async function loadPublished(){
  if(!admin)return;const root=$('publishedCards');root.replaceChildren();$('publishedStatus').textContent='Loading published adverts…';
  try{
@@ -80,7 +100,7 @@ async function loadPublished(){
    const text=document.createElement('div');const title=document.createElement('b');title.textContent=x.title||'Untitled';const meta=document.createElement('small');meta.textContent=(x.category||'')+' · '+(x.county||'')+' · '+(x.advertiserTier||'basic').toUpperCase();text.append(title,meta);
    const pause=document.createElement('button');pause.className='button';pause.textContent='Pause advert';pause.addEventListener('click',async()=>{
     if(!confirm('Pause this advert? It will disappear from public listings.'))return;
-    try{await updateDoc(doc(db,'publicListings',s.id),{status:'paused',reviewedAt:serverTimestamp(),reviewedBy:user.uid,updatedAt:serverTimestamp(),rejectionReason:'Paused by marketplace administrator.'});await loadPublished();}catch(e){alert('Could not pause advert: '+e.message);}
+    try{await updateDoc(doc(db,'publicListings',s.id),{status:'paused',reviewedAt:serverTimestamp(),reviewedBy:user.uid,updatedAt:serverTimestamp(),rejectionReason:'Paused by marketplace administrator.'});await writeAudit(s.id,x.ownerUid,'paused','Paused by marketplace administrator.',x.advertiserTier||'basic');await loadPublished();await loadAudit();}catch(e){alert('Could not pause advert: '+e.message);}
    });
    row.append(text,pause);root.append(row);
   });
