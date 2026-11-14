@@ -101,11 +101,16 @@ async function loadPublished(){
   snap.forEach(s=>{
    const x=s.data(),row=document.createElement('article');row.className='published-row';
    const text=document.createElement('div');const title=document.createElement('b');title.textContent=x.title||'Untitled';const meta=document.createElement('small');meta.textContent=(x.category||'')+' · '+(x.county||'')+' · '+(x.advertiserTier||'basic').toUpperCase();text.append(title,meta);
+   const tier=document.createElement('select');tier.className='moderation-tier';tier.innerHTML='<option value="basic">Basic</option><option value="standard">Standard</option><option value="premium">Premium</option>';tier.value=x.advertiserTier||'basic';
+   const saveTier=document.createElement('button');saveTier.className='button';saveTier.textContent='Update tier';saveTier.addEventListener('click',async()=>{
+    try{await updateDoc(doc(db,'publicListings',s.id),{advertiserTier:tier.value,reviewedAt:serverTimestamp(),reviewedBy:user.uid,updatedAt:serverTimestamp()});await writeAudit(s.id,x.ownerUid,'tier_changed','Advertiser tier changed to '+tier.value+'.',tier.value);await loadPublished();await loadAudit();}catch(e){alert('Could not update tier: '+e.message);}
+   });
    const pause=document.createElement('button');pause.className='button';pause.textContent='Pause advert';pause.addEventListener('click',async()=>{
     if(!confirm('Pause this advert? It will disappear from public listings.'))return;
     try{await updateDoc(doc(db,'publicListings',s.id),{status:'paused',reviewedAt:serverTimestamp(),reviewedBy:user.uid,updatedAt:serverTimestamp(),rejectionReason:'Paused by marketplace administrator.'});await writeAudit(s.id,x.ownerUid,'paused','Paused by marketplace administrator.',x.advertiserTier||'basic');await loadPublished();await loadAudit();}catch(e){alert('Could not pause advert: '+e.message);}
    });
-   row.append(text,pause);root.append(row);
+   const controls=document.createElement('div');controls.className='moderation-actions';controls.append(tier,saveTier,pause);
+   row.append(text,controls);root.append(row);
   });
  }catch(e){$('publishedStatus').textContent='Could not load published adverts: '+e.message;}
 }
