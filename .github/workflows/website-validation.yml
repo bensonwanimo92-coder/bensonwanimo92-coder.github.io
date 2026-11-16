@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - '*.js'
-      - '*.html'
+      - '*.html'\n      - '*.css'\n      - '*.webmanifest'
       - '.github/workflows/website-validation.yml'
   push:
     branches:
@@ -38,4 +38,4 @@ jobs:
           test -s admin.html
           grep -q 'publicListings' app.js
           grep -q 'PN9bC3ZzgSaOK1JjG4TcjCU9Grx1' admin.js
-          grep -q 'emailVerified' dashboard.js
+          grep -q 'emailVerified' dashboard.js\n          grep -q 'inventoryWorkspace' admin.html\n          grep -q 'marketplaceModerationLogs' admin.js
