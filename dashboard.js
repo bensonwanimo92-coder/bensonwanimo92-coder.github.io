@@ -1,6 +1,7 @@
-import {auth,db} from "./firebase-config.js";
+import {auth,db,storage} from "./firebase-config.js";
 import {createUserWithEmailAndPassword,onAuthStateChanged,sendEmailVerification,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {addDoc,collection,getDocs,orderBy,query,serverTimestamp,updateDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import {deleteObject,getDownloadURL,ref as storageRef,uploadBytesResumable} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 const $=id=>document.getElementById(id),form=$('listingForm');let currentUser=null;
 $('authForm').addEventListener('submit',e=>e.preventDefault());
 const say=t=>$('authStatus').textContent=t;
@@ -15,8 +16,55 @@ $('refreshVerification').addEventListener('click',async()=>{try{await auth.curre
 $('signOutButton').addEventListener('click',()=>signOut(auth));
 onAuthStateChanged(auth,async u=>{setUser(u);if(u)try{await refresh();}catch(e){console.error(e);$('myListingsBody').innerHTML='<tr><td colspan="5">Could not load adverts. Check Firestore rules and indexes.</td></tr>';}});
 const media=$('mediaFiles'),preview=$('mediaPreview');let objectUrls=[];
-media.addEventListener('change',()=>{objectUrls.forEach(URL.revokeObjectURL);objectUrls=[];preview.replaceChildren();const files=[...media.files];if(files.length>8){alert('Please select up to 8 files.');media.value='';return;}for(const f of files){if(f.size>25*1024*1024){alert(f.name+' is larger than 25 MB.');media.value='';preview.replaceChildren();return;}const url=URL.createObjectURL(f);objectUrls.push(url);const item=document.createElement('div');item.className='media-thumb';if(f.type.startsWith('image/')){const im=document.createElement('img');im.src=url;im.alt=f.name;item.append(im);}else{const v=document.createElement('video');v.src=url;v.controls=true;item.append(v);}const label=document.createElement('small');label.textContent=f.name;item.append(label);preview.append(item);}});
-async function save(intent){if(!currentUser){alert('Sign in before saving an advert.');return;}if(!currentUser.emailVerified){alert('Verify your email before submitting adverts.');return;}if(!form.reportValidity())return;const d=new FormData(form),price=Number(d.get('price')),files=[...(media.files||[])];if(!Number.isFinite(price)||price<=0){alert('Enter a positive price or rate in KSh.');return;}if(files.length>0){alert('Your selected media is preview-only until the secure Firebase Storage rules are deployed. Please submit the advert without files for now.');return;}const record={ownerUid:currentUser.uid,title:String(d.get('title')).trim(),category:String(d.get('category')),advertType:String(d.get('adType')).trim(),county:String(d.get('county')).trim(),town:String(d.get('location')).trim(),price,currency:'KES',description:String(d.get('description')).trim(),contactPhone:String(d.get('phone')).trim(),photoUrls:[],media:[],videoUrls:[],details:{specifications:String(d.get('specifications')||'').trim(),reference:String(d.get('reference')||'').trim()},status:'draft',createdAt:serverTimestamp(),updatedAt:serverTimestamp()};try{const ref=await addDoc(collection(db,'publicListings'),record);if(intent==='submit'){await updateDoc(ref,{status:'pending',submittedAt:serverTimestamp(),updatedAt:serverTimestamp()});alert('Your advert has been submitted for moderation. It will appear publicly only after approval.');}else alert('Your advert draft has been saved.');form.reset();preview.replaceChildren();objectUrls.forEach(URL.revokeObjectURL);objectUrls=[];await refresh();}catch(e){console.error(e);alert('Could not save advert: '+e.message);}}
+media.addEventListener('change',()=>{objectUrls.forEach(URL.revokeObjectURL);objectUrls=[];preview.replaceChildren();const files=[...media.files];if(files.length>8){alert('Please select up to 8 files.');media.value='';return;}for(const f of files){if(f.size>20*1024*1024){alert(f.name+' is larger than 25 MB.');media.value='';preview.replaceChildren();return;}const url=URL.createObjectURL(f);objectUrls.push(url);const item=document.createElement('div');item.className='media-thumb';if(f.type.startsWith('image/')){const im=document.createElement('img');im.src=url;im.alt=f.name;item.append(im);}else{const v=document.createElement('video');v.src=url;v.controls=true;item.append(v);}const label=document.createElement('small');label.textContent=f.name;item.append(label);preview.append(item);}});
+async function save(intent){
+ if(!currentUser){alert('Sign in before saving an advert.');return;}
+ if(!currentUser.emailVerified){alert('Verify your email before submitting adverts.');return;}
+ if(!form.reportValidity())return;
+ const d=new FormData(form),price=Number(d.get('price')),files=[...(media.files||[])];
+ if(!Number.isFinite(price)||price<=0){alert('Enter a positive price or rate in KSh.');return;}
+ if(files.length>8){alert('Choose no more than 8 media files.');return;}
+ for(const file of files){
+  if(file.size>20*1024*1024){alert(file.name+' exceeds the 20 MB upload limit.');return;}
+  if(!/^(image\/(jpeg|png|webp)|video\/(mp4|webm|quicktime))$/.test(file.type)){alert(file.name+' is not a supported image or video.');return;}
+ }
+ const record={ownerUid:currentUser.uid,title:String(d.get('title')).trim(),category:String(d.get('category')),advertType:String(d.get('adType')).trim(),county:String(d.get('county')).trim(),town:String(d.get('location')).trim(),price,currency:'KES',description:String(d.get('description')).trim(),contactPhone:String(d.get('phone')).trim(),photoUrls:[],media:[],videoUrls:[],details:{specifications:String(d.get('specifications')||'').trim(),reference:String(d.get('reference')||'').trim()},status:'draft',createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
+ const submitButton=$('submitListingButton'),draftButton=$('saveDraftButton');
+ submitButton.disabled=true;draftButton.disabled=true;
+ const uploaded=[];
+ try{
+  const listingRef=await addDoc(collection(db,'publicListings'),record);
+  for(let i=0;i<files.length;i++){
+   const file=files[i],clean=file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-80),path='listing_media/'+currentUser.uid+'/'+listingRef.id+'/'+Date.now()+'-'+i+'-'+clean;
+   const target=storageRef(storage,path),task=uploadBytesResumable(target,file,{contentType:file.type});
+   await new Promise((resolve,reject)=>{
+    task.on('state_changed',snapshot=>{
+     const total=files.reduce((sum,item)=>sum+item.size,0);
+     const completed=uploaded.reduce((sum,item)=>sum+item.size,0);
+     const current=completed+snapshot.bytesTransferred;
+     $('listingPreview').hidden=false;
+     $('listingPreview').textContent='Uploading media '+(i+1)+' of '+files.length+' · '+Math.round(total?current/total*100:0)+'%';
+    },reject,resolve);
+   });
+   const url=await getDownloadURL(task.snapshot.ref);
+   const item={kind:file.type.startsWith('image/')?'image':'video',storagePath:path,contentType:file.type,size:file.size,name:file.name,url};
+   uploaded.push(item);
+  }
+  const photos=uploaded.filter(item=>item.kind==='image'),videos=uploaded.filter(item=>item.kind==='video');
+  const patch={photoUrls:photos.map(item=>item.url),videoUrls:videos.map(item=>item.url),media:uploaded,updatedAt:serverTimestamp()};
+  if(intent==='submit')Object.assign(patch,{status:'pending',submittedAt:serverTimestamp()});
+  await updateDoc(listingRef,patch);
+  alert(intent==='submit'?'Your advert and media have been uploaded and submitted for moderation. It will appear publicly only after approval.':'Your advert draft and media have been saved securely.');
+  form.reset();preview.replaceChildren();objectUrls.forEach(URL.revokeObjectURL);objectUrls=[];
+  $('listingPreview').hidden=true;await refresh();
+ }catch(e){
+  console.error(e);
+  for(const item of uploaded){try{await deleteObject(storageRef(storage,item.storagePath));}catch(cleanupError){console.warn('Could not remove an incomplete upload:',cleanupError);}}
+  $('listingPreview').hidden=false;
+  $('listingPreview').textContent='Upload or save failed: '+e.message+' . Your advert has not been submitted for publication.';
+  alert('Could not save advert: '+e.message);
+ }finally{submitButton.disabled=false;draftButton.disabled=false;}
+}
 form.addEventListener('submit',e=>{e.preventDefault();save('draft');});$('submitListingButton').addEventListener('click',()=>save('submit'));
 $('year').textContent=new Date().getFullYear();
 const params=new URLSearchParams(location.search),cat=params.get('category');if(cat&&[...$('categorySelect').options].some(o=>o.value===cat||o.text===cat))$('categorySelect').value=cat;

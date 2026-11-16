@@ -5,6 +5,9 @@ on:
     paths:
       - '*.js'
       - '*.html'
+      - '*.css'
+      - '*.webmanifest'
+      - 'README.md'
       - '.github/workflows/website-validation.yml'
   push:
     branches:
@@ -12,6 +15,8 @@ on:
     paths:
       - '*.js'
       - '*.html'
+      - '*.css'
+      - '*.webmanifest'
       - '.github/workflows/website-validation.yml'
 
 permissions:
@@ -39,3 +44,7 @@ jobs:
           grep -q 'publicListings' app.js
           grep -q 'PN9bC3ZzgSaOK1JjG4TcjCU9Grx1' admin.js
           grep -q 'emailVerified' dashboard.js
+          grep -q 'inventoryWorkspace' admin.html
+          grep -q 'marketplaceModerationLogs' admin.js
+          grep -q 'uploadBytesResumable' dashboard.js
+          grep -q 'getStorage(app)' firebase-config.js
