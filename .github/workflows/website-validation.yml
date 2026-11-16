@@ -42,7 +42,8 @@ jobs:
           test -s advertiser.html
           test -s admin.html
           grep -q 'publicListings' app.js
-          grep -q 'PN9bC3ZzgSaOK1JjG4TcjCU9Grx1' admin.js
+          grep -q "bensonwanimo92@gmail.com" admin.js
+          grep -q 'sendPasswordResetEmail' dashboard.js
           grep -q 'emailVerified' dashboard.js
           grep -q 'inventoryWorkspace' admin.html
           grep -q 'marketplaceModerationLogs' admin.js
