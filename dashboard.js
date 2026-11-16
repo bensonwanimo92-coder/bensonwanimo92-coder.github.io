@@ -1,5 +1,5 @@
 import {auth,db,storage} from "./firebase-config.js";
-import {createUserWithEmailAndPassword,onAuthStateChanged,sendEmailVerification,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {createUserWithEmailAndPassword,onAuthStateChanged,sendEmailVerification,sendPasswordResetEmail,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {addDoc,collection,getDocs,orderBy,query,serverTimestamp,updateDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 import {deleteObject,getDownloadURL,ref as storageRef,uploadBytesResumable} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 const $=id=>document.getElementById(id),form=$('listingForm');let currentUser=null;
@@ -10,11 +10,70 @@ const safe=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'
 const money=n=>Number(n)>0?new Intl.NumberFormat('en-KE',{style:'currency',currency:'KES',maximumFractionDigits:0}).format(Number(n)):'Negotiable / contact';
 function setUser(u){currentUser=u;$('workspaceName').textContent=u?(u.displayName||u.email?.split('@')[0]||'Advertiser'):'Guest workspace';$('workspaceEmail').textContent=u?u.email:'Sign in to manage adverts';$('signOutButton').hidden=!u;$('authPanel').hidden=!!u&&u.emailVerified;if(u){say(u.emailVerified?'Signed in. You can now create and submit adverts.':'Verify your email before submitting adverts.');$('resendVerification').hidden=u.emailVerified;$('refreshVerification').hidden=u.emailVerified;}}
 async function refresh(){if(!currentUser)return;const q=query(collection(db,'publicListings'),where('ownerUid','==',currentUser.uid),orderBy('updatedAt','desc'));const snap=await getDocs(q),body=$('myListingsBody');body.replaceChildren();if(snap.empty){body.innerHTML='<tr><td colspan="5">No adverts yet. Create your first one below.</td></tr>';return;}snap.forEach(d=>{const x=d.data(),tr=document.createElement('tr');tr.innerHTML='<td><b>'+safe(x.title)+'</b><small style="display:block;color:#889388">'+safe(x.town)+' '+safe(x.county)+'</small></td><td>'+safe(x.category)+'</td><td>'+money(x.price)+'</td><td>'+safe(String(x.status||'draft').toUpperCase())+'</td><td>'+(x.updatedAt?.toDate?x.updatedAt.toDate().toLocaleDateString():'Just now')+'</td>';body.append(tr);});}
-$('loginButton').addEventListener('click',async()=>{try{await signInWithEmailAndPassword(auth,$('authEmail').value.trim(),$('authPassword').value);say('Signed in.');}catch(e){say(e.message);}});
-$('registerButton').addEventListener('click',async()=>{try{const c=await createUserWithEmailAndPassword(auth,$('authEmail').value.trim(),$('authPassword').value);await sendEmailVerification(c.user);say('Account created. Check your email for the verification link, then sign in.');}catch(e){say(e.message);}});
-$('resendVerification').addEventListener('click',async()=>{try{await sendEmailVerification(auth.currentUser);say('Verification email sent again.');}catch(e){say(e.message);}});
-$('refreshVerification').addEventListener('click',async()=>{try{await auth.currentUser.reload();setUser(auth.currentUser);if(auth.currentUser.emailVerified)await refresh();}catch(e){say(e.message);}});
-$('signOutButton').addEventListener('click',()=>signOut(auth));
+const authError=e=>{
+ const code=String(e?.code||'').replace('auth/','');
+ const messages={
+  'invalid-email':'That email address is not valid. Check the spelling and try again.',
+  'email-already-in-use':'An account already exists for this email. Sign in instead, or use Forgot password.',
+  'weak-password':'Choose a stronger password with at least 8 characters.',
+  'missing-password':'Enter your password to continue.',
+  'invalid-credential':'Email or password is incorrect. Check both, or reset your password.',
+  'user-not-found':'No account was found for this email. Create an account first.',
+  'wrong-password':'The password is incorrect. Use Forgot password if needed.',
+  'too-many-requests':'Too many attempts. Wait a little before trying again.',
+  'operation-not-allowed':'Email/password sign-in is disabled in Firebase Authentication. The SkyNest Firebase administrator must enable the Email/Password provider.',
+  'network-request-failed':'Network connection failed. Check your internet and try again.',
+  'api-key-not-valid.-please-pass-a-valid-api-key.':'SkyNest Firebase web configuration is invalid. This needs a developer-side configuration fix.'
+ };
+ return messages[code]||('Authentication failed ('+(e?.code||'unknown')+'). '+(e?.message||'Please try again.'));
+};
+const setAuthBusy=busy=>{['loginButton','registerButton'].forEach(id=>$(id).disabled=busy);};
+$('loginButton').addEventListener('click',async()=>{
+ const email=$('authEmail').value.trim(),password=$('authPassword').value;
+ if(!$('authForm').reportValidity())return;
+ setAuthBusy(true);say('Signing in securely…');
+ try{
+  const credential=await signInWithEmailAndPassword(auth,email,password);
+  await credential.user.reload();
+  if(!credential.user.emailVerified){say('You are signed in, but your email is not verified yet. Open the verification email, then tap “I have verified — refresh status”.');$('resendVerification').hidden=false;$('refreshVerification').hidden=false;}
+  else say('Signed in successfully. Your SkyNest workspace is ready.');
+ }catch(e){say(authError(e));}finally{setAuthBusy(false);}
+});
+$('registerButton').addEventListener('click',async()=>{
+ const email=$('authEmail').value.trim(),password=$('authPassword').value;
+ if(!$('authForm').reportValidity())return;
+ setAuthBusy(true);say('Creating your secure SkyNest account…');
+ try{
+  const credential=await createUserWithEmailAndPassword(auth,email,password);
+  try{
+   await sendEmailVerification(credential.user);
+   say(email.toLowerCase()==='bensonwanimo92@gmail.com'
+    ?'Your account has been created. Verify this email using the link we sent. After verification, this address receives the initial SkyNest administrator access. Then open Admin Control Centre.'
+    :'Your account has been created. Verify your email using the link we sent before submitting adverts.');
+  }catch(mailError){
+   say('Your account was created, but the verification email could not be sent ('+(mailError.code||mailError.message)+'). Sign in and use “Resend verification email”.');
+   $('resendVerification').hidden=false;
+  }
+ }catch(e){say(authError(e));}finally{setAuthBusy(false);}
+});
+$('resendVerification').addEventListener('click',async()=>{
+ if(!auth.currentUser){say('Sign in first to resend your verification email.');return;}
+ try{await sendEmailVerification(auth.currentUser);say('A fresh verification email has been sent. Check Inbox, Spam and Promotions.');}
+ catch(e){say(authError(e));}
+});
+$('refreshVerification').addEventListener('click',async()=>{
+ if(!auth.currentUser){say('Sign in first, then refresh verification status.');return;}
+ try{await auth.currentUser.reload();const user=auth.currentUser;setUser(user);if(user.emailVerified){await user.getIdToken(true);await refresh();say('Email verified. Your SkyNest account is active. If this is the owner account, open Admin Control Centre.');}else say('Email is not verified yet. Open the link in your email, then try again.');}
+ catch(e){say(authError(e));}
+});
+$('signOutButton').addEventListener('click',async()=>{try{await signOut(auth);say('You have signed out.');}catch(e){say(authError(e));}});
+const forgot=document.createElement('button');forgot.type='button';forgot.className='text-link';forgot.textContent='Forgot password? Send reset email';forgot.addEventListener('click',async()=>{
+ const email=$('authEmail').value.trim();
+ if(!email){say('Enter your email address first, then tap Forgot password.');$('authEmail').focus();return;}
+ try{await sendPasswordResetEmail(auth,email);say('If an account exists for this email, a password-reset link has been sent. Check Inbox, Spam and Promotions.');}
+ catch(e){say(authError(e));}
+});
+$('authForm').append(forgot);
 onAuthStateChanged(auth,async u=>{setUser(u);if(u)try{await refresh();}catch(e){console.error(e);$('myListingsBody').innerHTML='<tr><td colspan="5">Could not load adverts. Check Firestore rules and indexes.</td></tr>';}});
 const media=$('mediaFiles'),preview=$('mediaPreview');let objectUrls=[];
 media.addEventListener('change',()=>{objectUrls.forEach(URL.revokeObjectURL);objectUrls=[];preview.replaceChildren();const files=[...media.files];if(files.length>8){alert('Please select up to 8 files.');media.value='';return;}for(const f of files){if(f.size>20*1024*1024){alert(f.name+' is larger than 25 MB.');media.value='';preview.replaceChildren();return;}const url=URL.createObjectURL(f);objectUrls.push(url);const item=document.createElement('div');item.className='media-thumb';if(f.type.startsWith('image/')){const im=document.createElement('img');im.src=url;im.alt=f.name;item.append(im);}else{const v=document.createElement('video');v.src=url;v.controls=true;item.append(v);}const label=document.createElement('small');label.textContent=f.name;item.append(label);preview.append(item);}});
