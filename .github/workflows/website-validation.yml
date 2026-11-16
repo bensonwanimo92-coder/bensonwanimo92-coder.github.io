@@ -48,3 +48,4 @@ jobs:
           grep -q 'marketplaceModerationLogs' admin.js
           grep -q 'uploadBytesResumable' dashboard.js
           grep -q 'getStorage(app)' firebase-config.js
+          grep -q 'MARKETPLACE_MEDIA_UPLOADS_ENABLED=false' dashboard.js

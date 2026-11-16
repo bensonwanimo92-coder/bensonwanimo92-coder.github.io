@@ -3,6 +3,7 @@ import {createUserWithEmailAndPassword,onAuthStateChanged,sendEmailVerification,
 import {addDoc,collection,getDocs,orderBy,query,serverTimestamp,updateDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 import {deleteObject,getDownloadURL,ref as storageRef,uploadBytesResumable} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 const $=id=>document.getElementById(id),form=$('listingForm');let currentUser=null;
+const MARKETPLACE_MEDIA_UPLOADS_ENABLED=false;
 $('authForm').addEventListener('submit',e=>e.preventDefault());
 const say=t=>$('authStatus').textContent=t;
 const safe=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -24,6 +25,7 @@ async function save(intent){
  const d=new FormData(form),price=Number(d.get('price')),files=[...(media.files||[])];
  if(!Number.isFinite(price)||price<=0){alert('Enter a positive price or rate in KSh.');return;}
  if(files.length>8){alert('Choose no more than 8 media files.');return;}
+ if(files.length&&!MARKETPLACE_MEDIA_UPLOADS_ENABLED){alert('Secure photo and video uploads are not active yet. Firebase Storage rollout must be completed first. Remove selected files to save or submit this advert without media for now.');return;}
  for(const file of files){
   if(file.size>20*1024*1024){alert(file.name+' exceeds the 20 MB upload limit.');return;}
   if(!/^(image\/(jpeg|png|webp)|video\/(mp4|webm|quicktime))$/.test(file.type)){alert(file.name+' is not a supported image or video.');return;}
