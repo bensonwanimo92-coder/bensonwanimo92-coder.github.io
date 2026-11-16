@@ -35,7 +35,7 @@ Configure a Firebase Web App in the same Firebase project as Android. Supply onl
 
 ## Firebase marketplace integration (staged)
 - The advertiser portal includes Firebase email/password registration and sign-in, email verification, cloud draft saving and submission for moderation.
-- Advertiser images and short clips upload to owner-scoped `listing_media/{uid}/{listingId}/...` paths, with file-type and 20 MB limits; listing documents retain media URLs and metadata.
+- The advertiser media uploader is prepared for owner-scoped `listing_media/{uid}/{listingId}/...` paths, with file-type and 20 MB limits. It remains feature-gated until Firebase Storage is enabled and its rules are deployed; media selection currently provides preview only.
 - The public feed is wired to read only approved, unexpired records from the separate `publicListings` collection.
 - A restricted moderation page uses the server-granted `marketplaceAdmin` custom claim to approve or reject submissions.
 - Firebase web configuration is a public client configuration; it is not a service-account credential.
