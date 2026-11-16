@@ -21,7 +21,9 @@ const authError=e=>{
   'user-not-found':'No account was found for this email. Create an account first.',
   'wrong-password':'The password is incorrect. Use Forgot password if needed.',
   'too-many-requests':'Too many attempts. Wait a little before trying again.',
-  'operation-not-allowed':'Email/password sign-in is disabled in Firebase Authentication. The SkyNest Firebase administrator must enable the Email/Password provider.',
+  'operation-not-allowed':'Email/password sign-in is disabled in Firebase Authentication. Enable Authentication → Sign-in method → Email/Password in the hello-chuka Firebase project.',
+  'unauthorized-domain':'Firebase is blocking this website domain. Add bensonwanimo92-coder.github.io under Firebase Console → Authentication → Settings → Authorized domains, then retry.',
+  'invalid-action-code':'That verification or reset link has expired or was already used. Request a fresh email link and try again.',
   'network-request-failed':'Network connection failed. Check your internet and try again.',
   'api-key-not-valid.-please-pass-a-valid-api-key.':'SkyNest Firebase web configuration is invalid. This needs a developer-side configuration fix.'
  };
