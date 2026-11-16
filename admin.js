@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import { getIdTokenResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, Timestamp, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 const $=id=>document.getElementById(id);
 let user=null,admin=false,records=[];
@@ -12,7 +12,7 @@ onAuthStateChanged(auth,async signedInUser=>{
   user=signedInUser;
   if(!user){$('accessStatus').textContent='Sign in with the verified administrator account to open Inventory.';const link=document.createElement('a');link.href='advertiser.html';link.className='button';link.textContent='Open secure sign-in';$('accessPanel').append(link);return;}
   try{await user.reload();user=auth.currentUser;}catch(e){$('accessStatus').textContent='Could not refresh account verification: '+e.message;return;}
-  admin=!!user&&user.uid==='PN9bC3ZzgSaOK1JjG4TcjCU9Grx1'&&user.email==='bensonwanimo92@gmail.com'&&user.emailVerified===true;
+  const token=await getIdTokenResult(user,true);\n  admin=token.claims.marketplaceAdmin===true||(user.uid==='PN9bC3ZzgSaOK1JjG4TcjCU9Grx1'&&user.email==='bensonwanimo92@gmail.com'&&user.emailVerified===true);
   if(admin){$('accessStatus').textContent='Verified administrator access confirmed.';$('inventoryWorkspace').hidden=false;await loadInventory();await loadActivity();}
   else{$('accessStatus').textContent='Access denied. This account is not the verified marketplace administrator.';$('inventoryWorkspace').hidden=true;}
 });
