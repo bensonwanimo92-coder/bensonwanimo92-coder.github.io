@@ -10,12 +10,12 @@ const date=value=>value?.toDate?value.toDate().toLocaleString('en-KE',{dateStyle
 $('signOutButton').addEventListener('click',async()=>{await signOut(auth);location.href='advertiser.html';});
 onAuthStateChanged(auth,async signedInUser=>{
   user=signedInUser;
-  if(!user){$('accessStatus').textContent='Sign in with the verified administrator account to open Inventory.';const link=document.createElement('a');link.href='advertiser.html';link.className='button';link.textContent='Open secure sign-in';$('accessPanel').append(link);return;}
+  if(!user){$('accessStatus').textContent='First create or sign in to your owner account in Advertiser Studio. Verify the owner email before returning here.';const link=document.createElement('a');link.href='advertiser.html';link.className='button';link.textContent='Create owner account / Sign in';$('accessPanel').append(link);return;}
   try{await user.reload();user=auth.currentUser;}catch(e){$('accessStatus').textContent='Could not refresh account verification: '+e.message;return;}
   const token=await getIdTokenResult(user,true);
-  admin=token.claims.marketplaceAdmin===true||(user.uid==='PN9bC3ZzgSaOK1JjG4TcjCU9Grx1'&&user.email==='bensonwanimo92@gmail.com'&&user.emailVerified===true);
+  admin=token.claims.marketplaceAdmin===true||(user.email?.toLowerCase()==='bensonwanimo92@gmail.com'&&user.emailVerified===true);
   if(admin){$('accessStatus').textContent='Verified administrator access confirmed.';$('inventoryWorkspace').hidden=false;await loadInventory();await loadActivity();}
-  else{$('accessStatus').textContent='Access denied. This account is not the verified marketplace administrator.';$('inventoryWorkspace').hidden=true;}
+  else{$('accessStatus').textContent='Access denied. Sign in with the verified SkyNest owner email (bensonwanimo92@gmail.com). If you have not created it yet, open Advertiser Studio, create the account with that email, verify it from your inbox, then return here.';$('inventoryWorkspace').hidden=true;}
 });
 $('refreshButton').addEventListener('click',async()=>{await loadInventory();await loadActivity();});
 $('inventorySearch').addEventListener('input',renderInventory);
