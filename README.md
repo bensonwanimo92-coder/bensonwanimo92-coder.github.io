@@ -34,7 +34,8 @@ This is a static GitHub Pages website. County navigation and preview interaction
 Configure a Firebase Web App in the same Firebase project as Android. Supply only public web config (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId) and confirm Email/Password authentication is enabled. Never share a service-account JSON or private key.
 
 ## Firebase marketplace integration (staged)
-- The advertiser portal now includes Firebase email/password registration and sign-in, email verification, cloud draft saving and submission for moderation.
+- The advertiser portal includes Firebase email/password registration and sign-in, email verification, cloud draft saving and submission for moderation.
+- Advertiser images and short clips upload to owner-scoped `listing_media/{uid}/{listingId}/...` paths, with file-type and 20 MB limits; listing documents retain media URLs and metadata.
 - The public feed is wired to read only approved, unexpired records from the separate `publicListings` collection.
 - A restricted moderation page uses the server-granted `marketplaceAdmin` custom claim to approve or reject submissions.
 - Firebase web configuration is a public client configuration; it is not a service-account credential.
