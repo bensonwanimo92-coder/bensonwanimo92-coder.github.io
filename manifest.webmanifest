@@ -3,7 +3,7 @@
   "short_name": "SkyNest",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f7f6f0",
-  "theme_color": "#101914",
-  "description": "Discover and advertise property across Kenya."
+  "background_color": "#f3f7ff",
+  "theme_color": "#071a38",
+  "description": "Discover, advertise and connect across Kenya with SkyNest."
 }
