@@ -2,7 +2,29 @@
 <main class="main" id="overview"><header class="topbar"><div><span class="crumb">SKYNEST / ADVERTISER STUDIO</span><h1>Grow your reach.</h1></div><div class="top-actions"><span class="preview-pill"><i></i> ACCOUNT SECURE</span><button class="button" id="signOutButton" type="button" hidden>Sign out</button><a class="button" href="#new-listing">＋ Create advert</a></div></header>
 <div class="notice"><b>One marketplace. Every opportunity.</b><span>Advertise property, land, farms, vehicles, vacancies, restaurants, luxury goods, services and more. All adverts are reviewed before publication.</span></div>
 <section class="welcome"><div><span class="eyebrow">WELCOME TO THE MARKETPLACE</span><h2>Put your offering<br><em>in the spotlight.</em></h2><p>Reach people across Kenya with a rich, clear advert.</p></div><div class="welcome-art"><div class="art-building">✦</div><span>DISCOVER · ADVERTISE · CONNECT</span></div></section>
-<section class="panel" id="authPanel"><div class="panel-heading"><div><span class="eyebrow dark">SECURE ADVERTISER ACCESS</span><h2>Sign in or create your account</h2><p>Verify your email to submit adverts for review.</p></div></div><form id="authForm" class="listing-form"><div class="form-grid"><label>Email address<input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters"></label></div><div class="form-footer"><p id="authStatus" role="status">Not signed in.</p><div><button class="button dark-button" id="loginButton" type="button">Sign in</button> <button class="button" id="registerButton" type="button">Create account</button></div></div><button class="text-link" id="resendVerification" type="button" hidden>Resend verification email</button> <button class="text-link" id="refreshVerification" type="button" hidden>I've verified — refresh status</button></form></section>
+<section class="portal-shell" id="authPanel" aria-labelledby="portalTitle">
+ <div class="portal-showcase">
+  <div class="portal-orbit orbit-one"></div><div class="portal-orbit orbit-two"></div>
+  <span class="portal-kicker">SKYNEST MEMBER PORTAL</span>
+  <div class="portal-emblem"><span>✦</span><b>S</b></div>
+  <h2 id="portalTitle">Your next move<br><em>starts here.</em></h2>
+  <p>Sign in to your SkyNest space, manage your adverts and connect your opportunities with people across Kenya.</p>
+  <div class="portal-perks"><span>✧ Secure access</span><span>✧ Your own workspace</span><span>✧ Marketplace reach</span></div>
+  <div class="portal-spark spark-a">✦</div><div class="portal-spark spark-b">✧</div><div class="portal-spark spark-c">✦</div>
+ </div>
+ <div class="portal-form-side">
+  <div class="portal-heading"><span class="portal-lock">⌑</span><span class="eyebrow dark">WELCOME BACK</span><h2>Enter your portal</h2><p>Sign in or create a free SkyNest account.</p></div>
+  <form id="authForm" class="listing-form portal-form">
+   <label>Email address<input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+   <label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="Enter your password"></label>
+   <div class="portal-secure-note"><span>◈</span> Your account is protected with Firebase Authentication.</div>
+   <div class="portal-actions"><button class="button dark-button" id="loginButton" type="button">Sign in <span>↗</span></button><button class="button portal-register" id="registerButton" type="button">Create account</button></div>
+   <p id="authStatus" class="portal-status" role="status">Not signed in.</p>
+   <button class="text-link" id="resendVerification" type="button" hidden>Resend verification email</button>
+   <button class="text-link" id="refreshVerification" type="button" hidden>I've verified — refresh status</button>
+  </form>
+ </div>
+</section>
 <section class="panel" id="listings"><div class="panel-heading"><div><span class="eyebrow dark">YOUR ADVERTS</span><h2>Manage your submissions</h2><p>Track drafts, pending reviews and approved adverts.</p></div></div><div class="table-wrap"><table><thead><tr><th>ADVERT</th><th>CATEGORY</th><th>PRICE / RATE</th><th>STATUS</th><th>UPDATED</th></tr></thead><tbody id="myListingsBody"><tr><td colspan="5">Sign in to view your adverts.</td></tr></tbody></table></div></section>
 <section class="panel create-panel" id="new-listing"><div class="panel-heading"><div><span class="eyebrow dark">CREATE A MARKETPLACE ADVERT</span><h2>Tell the world what you're offering.</h2><p>Complete the details that apply to your category. Save a draft or submit for review.</p></div><span class="step-tag">NEW ADVERT</span></div>
 <form id="listingForm" class="listing-form"><div class="form-grid"><label>Advert title<input name="title" required minlength="8" maxlength="100" placeholder="A clear title people will search for"></label><label>Marketplace category<select name="category" id="categorySelect" required><option value="">Choose category</option><option value="Residential">Homes & Residential</option><option value="Commercial">Commercial Property</option><option value="Land">Land & Plots</option><option value="Development">Property Development</option><option value="Farms">Farms & Agriculture</option><option value="Vehicles">Cars & Vehicles</option><option value="Jobs">Jobs & Careers</option><option value="Restaurants">Restaurants & Dining</option><option value="Hospitality">Hospitality & Accommodation</option><option value="Products">Products & Retail</option><option value="Services">Professional Services</option><option value="Luxury">Luxury & Lifestyle</option><option value="Business">Business & Companies</option><option value="Other">Other</option></select></label></div>
