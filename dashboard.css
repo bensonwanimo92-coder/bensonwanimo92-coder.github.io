@@ -93,3 +93,51 @@ footer{border-color:#dce6f5}
 @media(max-width:850px){.portal-shell{grid-template-columns:1fr}.portal-showcase{min-height:300px;padding:30px 27px}.portal-emblem{margin:20px 0 12px}.portal-showcase h2{font-size:34px}.portal-form-side{padding:30px 24px}}
 @media(max-width:520px){.portal-showcase{min-height:275px;padding:25px 22px}.portal-showcase>p{font-size:11px}.portal-perks{gap:7px}.portal-perks span{font-size:8px}.portal-form-side{padding:27px 18px}.portal-actions{grid-template-columns:1fr}.portal-heading h2{font-size:22px}}
 @media(prefers-reduced-motion:reduce){.portal-shell,.portal-emblem,.portal-emblem span,.portal-showcase:before,.portal-showcase:after,.portal-orbit,.portal-spark{animation:none!important}.portal-actions .button,.portal-form input{transition:none!important}}
+
+
+/* Institutional customer portal inspired by the clear, formal layout of university portals */
+.institutional-portal{display:block!important;margin:0!important;min-height:100vh;background:#f2f4f7!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important;animation:none!important}
+body:has(#authPanel:not([hidden])){background:#f2f4f7}
+body:has(#authPanel:not([hidden])) .sidebar{display:none}
+body:has(#authPanel:not([hidden])) .main{margin-left:0!important;padding:0!important;min-height:100vh}
+body:has(#authPanel:not([hidden])) .main>.topbar,
+body:has(#authPanel:not([hidden])) .main>.notice,
+body:has(#authPanel:not([hidden])) .main>.welcome,
+body:has(#authPanel:not([hidden])) .main>section:not(.institutional-portal),
+body:has(#authPanel:not([hidden])) .main>footer{display:none!important}
+.institutional-masthead{height:76px;background:#082b59;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 max(5%,calc((100% - 1160px)/2));border-bottom:4px solid #e0b84f}
+.institutional-brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
+.institutional-mark{width:43px;height:43px;display:grid;place-items:center;border:2px solid #e4c66e;border-radius:50%;font:800 23px Manrope;color:#f3d98c}
+.institutional-brand b,.institutional-brand small{display:block}
+.institutional-brand b{font:800 20px Manrope;letter-spacing:.2px}
+.institutional-brand small{font-size:8px;letter-spacing:2px;color:#c6d8ed}
+.masthead-right{display:flex;align-items:center;gap:24px;font-size:11px;color:#dce8f6}
+.masthead-right a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.institutional-content{max-width:1060px;margin:0 auto;padding:58px 24px 70px;display:grid;grid-template-columns:1fr 440px;gap:70px;align-items:start}
+.institutional-intro{padding-top:26px}
+.institutional-rule{display:block;width:54px;height:4px;background:#d9b64d;margin-bottom:20px}
+.institutional-intro .eyebrow{font-size:10px;letter-spacing:1.7px;color:#315f91}
+.institutional-intro h2{font:700 clamp(30px,4vw,42px)/1.15 Manrope;color:#12345b;letter-spacing:-1.2px;margin:14px 0}
+.institutional-intro p{max-width:410px;color:#66758a;font-size:14px;line-height:1.85}
+.institutional-login{background:#fff;border:1px solid #d8dee8;border-top:4px solid #123e70;border-radius:3px;padding:30px 32px;box-shadow:0 8px 24px #132d4c0b}
+.login-title{display:flex;align-items:center;gap:14px;padding-bottom:20px;border-bottom:1px solid #e8ecf2}
+.login-symbol{width:43px;height:43px;display:grid;place-items:center;background:#edf3fa;border:1px solid #d6e1ee;color:#123e70;font:800 22px Manrope;border-radius:3px}
+.login-title h3{font:700 21px Manrope;color:#183a60;margin:0 0 4px}
+.login-title p{font-size:11px;color:#718096;margin:0}
+.institutional-login .portal-form{max-width:none;margin:20px 0 0}
+.institutional-login .portal-form label{font-size:11px;font-weight:700;color:#3c4f66;margin:15px 0}
+.institutional-login .portal-form input{padding:13px 12px;border:1px solid #cbd4df;border-radius:3px;background:#fff;font-size:13px;box-shadow:none;transform:none}
+.institutional-login .portal-form input:focus{border-color:#2f659b;box-shadow:0 0 0 2px #2f659b18}
+.institutional-help{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:8px 0 18px;font-size:10px;color:#748196}
+.institutional-help a{color:#17558c;text-decoration:underline}
+.institutional-login .portal-actions{grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.institutional-login .portal-actions .button{border-radius:3px;padding:12px 9px;font-size:11px;box-shadow:none;transform:none}
+.institutional-login .portal-actions .dark-button{background:#123e70}
+.institutional-login .portal-register{background:#f1f5f9!important;color:#174a7b!important;border:1px solid #cbd8e6}
+.institutional-login .portal-status{text-align:left;min-height:16px}
+.institutional-notice{margin-top:20px;padding:13px 14px;background:#f5f7fa;border:1px solid #e2e7ee;color:#68778a;font-size:10px;line-height:1.7}
+.institutional-notice b{color:#24486f}
+.institutional-footer{max-width:1060px;margin:0 auto;padding:18px 24px 25px;border-top:1px solid #d9e0e8;display:flex;gap:22px;justify-content:space-between;flex-wrap:wrap;color:#7b8796;font-size:10px}
+.institutional-footer a{color:#245681;text-decoration:underline}
+@media(max-width:800px){.institutional-content{grid-template-columns:1fr;gap:25px;padding:35px 18px 45px}.institutional-intro{padding-top:0}.institutional-intro p{max-width:540px}.institutional-login{max-width:520px;width:100%;margin:0 auto}.institutional-footer{margin:0 18px;padding-left:0;padding-right:0}}
+@media(max-width:480px){.institutional-masthead{height:66px;padding:0 16px}.institutional-mark{width:38px;height:38px}.institutional-brand b{font-size:18px}.masthead-right{gap:0}.masthead-right>span{display:none}.institutional-content{padding:28px 14px 38px}.institutional-login{padding:22px 18px}.institutional-login .portal-actions{grid-template-columns:1fr}.institutional-footer{margin:0 14px;gap:9px;flex-direction:column}}
