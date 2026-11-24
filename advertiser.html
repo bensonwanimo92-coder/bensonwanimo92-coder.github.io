@@ -2,28 +2,32 @@
 <main class="main" id="overview"><header class="topbar"><div><span class="crumb">SKYNEST / ADVERTISER STUDIO</span><h1>Grow your reach.</h1></div><div class="top-actions"><span class="preview-pill"><i></i> ACCOUNT SECURE</span><button class="button" id="signOutButton" type="button" hidden>Sign out</button><a class="button" href="#new-listing">＋ Create advert</a></div></header>
 <div class="notice"><b>One marketplace. Every opportunity.</b><span>Advertise property, land, farms, vehicles, vacancies, restaurants, luxury goods, services and more. All adverts are reviewed before publication.</span></div>
 <section class="welcome"><div><span class="eyebrow">WELCOME TO THE MARKETPLACE</span><h2>Put your offering<br><em>in the spotlight.</em></h2><p>Reach people across Kenya with a rich, clear advert.</p></div><div class="welcome-art"><div class="art-building">✦</div><span>DISCOVER · ADVERTISE · CONNECT</span></div></section>
-<section class="portal-shell" id="authPanel" aria-labelledby="portalTitle">
- <div class="portal-showcase">
-  <div class="portal-orbit orbit-one"></div><div class="portal-orbit orbit-two"></div>
-  <span class="portal-kicker">SKYNEST MEMBER PORTAL</span>
-  <div class="portal-emblem"><span>✦</span><b>S</b></div>
-  <h2 id="portalTitle">Your next move<br><em>starts here.</em></h2>
-  <p>Sign in to your SkyNest space, manage your adverts and connect your opportunities with people across Kenya.</p>
-  <div class="portal-perks"><span>✧ Secure access</span><span>✧ Your own workspace</span><span>✧ Marketplace reach</span></div>
-  <div class="portal-spark spark-a">✦</div><div class="portal-spark spark-b">✧</div><div class="portal-spark spark-c">✦</div>
+<section class="portal-shell institutional-portal" id="authPanel" aria-labelledby="portalTitle">
+ <header class="institutional-masthead">
+  <a class="institutional-brand" href="index.html"><span class="institutional-mark">S</span><span><b>SkyNest</b><small>PROPERTY NETWORK</small></span></a>
+  <div class="masthead-right"><span>Customer access portal</span><a href="mailto:bensonwanimo92@gmail.com">Portal support</a></div>
+ </header>
+ <div class="institutional-content">
+  <div class="institutional-intro">
+   <span class="institutional-rule"></span><span class="eyebrow">SKYNEST ONLINE SERVICES</span>
+   <h2 id="portalTitle">Customer Portal</h2>
+   <p>Sign in to manage your adverts, follow submissions and connect with opportunities across Kenya.</p>
+  </div>
+  <div class="institutional-login">
+   <div class="login-title"><span class="login-symbol">S</span><div><h3>Portal Login</h3><p>Enter your registered account details to continue.</p></div></div>
+   <form id="authForm" class="listing-form portal-form">
+    <label>Email Address<input id="authEmail" type="email" autocomplete="email" required placeholder="Enter your email address"></label>
+    <label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="Enter your password"></label>
+    <div class="institutional-help"><span>Use the email address you registered with.</span><a href="mailto:bensonwanimo92@gmail.com?subject=SkyNest%20portal%20password%20help">Forgot password / Need help?</a></div>
+    <div class="portal-actions"><button class="button dark-button" id="loginButton" type="button">Login</button><button class="button portal-register" id="registerButton" type="button">Create customer account</button></div>
+    <p id="authStatus" class="portal-status" role="status">Not signed in.</p>
+    <button class="text-link" id="resendVerification" type="button" hidden>Resend verification email</button>
+    <button class="text-link" id="refreshVerification" type="button" hidden>I've verified — refresh status</button>
+   </form>
+   <div class="institutional-notice"><b>New to SkyNest?</b> Create a customer account to submit adverts. Public registrations do not receive administrator access.</div>
+  </div>
  </div>
- <div class="portal-form-side">
-  <div class="portal-heading"><span class="portal-lock">⌑</span><span class="eyebrow dark">WELCOME BACK</span><h2>Enter your portal</h2><p>Sign in or create a free customer account.</p></div>
-  <form id="authForm" class="listing-form portal-form">
-   <label>Email address<input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
-   <label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="Enter your password"></label>
-   <div class="portal-secure-note"><span>◈</span> Your account is protected with Firebase Authentication.</div>
-   <div class="portal-actions"><button class="button dark-button" id="loginButton" type="button">Sign in <span>↗</span></button><button class="button portal-register" id="registerButton" type="button">Create account</button></div>
-   <p id="authStatus" class="portal-status" role="status">Not signed in.</p>
-   <button class="text-link" id="resendVerification" type="button" hidden>Resend verification email</button>
-   <button class="text-link" id="refreshVerification" type="button" hidden>I've verified — refresh status</button>
-  </form>
- </div>
+ <footer class="institutional-footer"><span>© <span id="portalYear"></span> SkyNest Property Network</span><span>Secure customer access · Kenya</span><a href="index.html">Back to marketplace</a></footer>
 </section>
 <section class="panel" id="listings"><div class="panel-heading"><div><span class="eyebrow dark">YOUR ADVERTS</span><h2>Manage your submissions</h2><p>Track drafts, pending reviews and approved adverts.</p></div></div><div class="table-wrap"><table><thead><tr><th>ADVERT</th><th>CATEGORY</th><th>PRICE / RATE</th><th>STATUS</th><th>UPDATED</th></tr></thead><tbody id="myListingsBody"><tr><td colspan="5">Sign in to view your adverts.</td></tr></tbody></table></div></section>
 <section class="panel create-panel" id="new-listing"><div class="panel-heading"><div><span class="eyebrow dark">CREATE A MARKETPLACE ADVERT</span><h2>Tell the world what you're offering.</h2><p>Complete the details that apply to your category. Save a draft or submit for review.</p></div><span class="step-tag">NEW ADVERT</span></div>
@@ -35,4 +39,4 @@
 <div class="form-grid"><label>Contact phone<input name="phone" type="tel" required placeholder="+254…"></label><label>Contact email (optional)<input name="contactEmail" type="email" placeholder="you@business.com"></label></div>
 <label class="upload-label">Photos and short video clips<input id="mediaFiles" name="mediaFiles" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple><span class="upload-box"><span>＋</span><b>Choose photos or short video clips</b><small>JPG, PNG, WebP, MP4 or WebM · Up to 8 files · 20 MB each</small></span></label><div id="mediaPreview" class="media-preview" aria-live="polite"></div><p class="upload-note">Media selection and preview are ready. Secure cloud uploads will switch on after Firebase Storage is enabled and its owner-only rules are deployed. Until then, remove selected files before saving or submitting an advert. Maximum 8 files, 20 MB each.</p>
 <div class="form-footer"><p>Only approved adverts appear publicly. Do not include passwords, ID numbers or sensitive personal data.</p><div><button class="button" id="saveDraftButton" type="submit">Save draft</button> <button class="button dark-button" id="submitListingButton" type="button">Submit for review ↗</button></div></div><output id="listingPreview" class="listing-preview" hidden></output></form></section>
-<section class="panel campaign-panel"><div><span class="eyebrow dark">MORE VISIBILITY</span><h2>Make your advert stand out.</h2><p>Featured placement and campaign tiers are planned. Payment checkout and paid promotion are not active yet.</p></div><div class="campaign-options"><article><span>01</span><b>Standard</b><small>Marketplace listing</small></article><article><span>02</span><b>Featured</b><small>Priority placement</small></article><article><span>03</span><b>Network</b><small>Website + app visibility</small></article></div></section><footer>© <span id="year"></span> SkyNest Marketplace <span>DISCOVER · ADVERTISE · CONNECT</span></footer></main></body></html>
+<section class="panel campaign-panel"><div><span class="eyebrow dark">MORE VISIBILITY</span><h2>Make your advert stand out.</h2><p>Featured placement and campaign tiers are planned. Payment checkout and paid promotion are not active yet.</p></div><div class="campaign-options"><article><span>01</span><b>Standard</b><small>Marketplace listing</small></article><article><span>02</span><b>Featured</b><small>Priority placement</small></article><article><span>03</span><b>Network</b><small>Website + app visibility</small></article></div></section><footer>© <span id="year"></span> SkyNest Marketplace <span>DISCOVER · ADVERTISE · CONNECT</span></footer></main><script>document.getElementById('portalYear').textContent=new Date().getFullYear();</script></body></html>
