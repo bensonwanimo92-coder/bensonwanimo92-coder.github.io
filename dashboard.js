@@ -49,9 +49,7 @@ $('registerButton').addEventListener('click',async()=>{
   const credential=await createUserWithEmailAndPassword(auth,email,password);
   try{
    await sendEmailVerification(credential.user);
-   say(email.toLowerCase()==='bensonwanimo92@gmail.com'
-    ?'Your account has been created. Verify this email using the link we sent. After verification, this address receives the initial SkyNest administrator access. Then open Admin Control Centre.'
-    :'Your account has been created. Verify your email using the link we sent before submitting adverts.');
+   say('Your customer account has been created. Verify your email using the link we sent before submitting adverts. Public sign-ups do not receive administrator privileges.');
   }catch(mailError){
    say('Your account was created, but the verification email could not be sent ('+(mailError.code||mailError.message)+'). Sign in and use “Resend verification email”.');
    $('resendVerification').hidden=false;
@@ -65,7 +63,7 @@ $('resendVerification').addEventListener('click',async()=>{
 });
 $('refreshVerification').addEventListener('click',async()=>{
  if(!auth.currentUser){say('Sign in first, then refresh verification status.');return;}
- try{await auth.currentUser.reload();const user=auth.currentUser;setUser(user);if(user.emailVerified){await user.getIdToken(true);await refresh();say('Email verified. Your SkyNest account is active. If this is the owner account, open Admin Control Centre.');}else say('Email is not verified yet. Open the link in your email, then try again.');}
+ try{await auth.currentUser.reload();const user=auth.currentUser;setUser(user);if(user.emailVerified){await user.getIdToken(true);await refresh();say('Email verified. Your SkyNest account is active. Your account remains a customer account unless an administrator separately grants a trusted role.');}else say('Email is not verified yet. Open the link in your email, then try again.');}
  catch(e){say(authError(e));}
 });
 $('signOutButton').addEventListener('click',async()=>{try{await signOut(auth);say('You have signed out.');}catch(e){say(authError(e));}});
